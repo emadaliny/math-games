@@ -1,0 +1,7204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spiral Revision – Year 8 Maths</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0c29;
+  --card: rgba(255,255,255,0.06);
+  --card-border: rgba(255,255,255,0.12);
+  --teal: #00d4aa;
+  --pink: #ff6b9d;
+  --yellow: #ffd93d;
+  --purple: #a855f7;
+  --blue: #38bdf8;
+  --orange: #fb923c;
+  --green: #4ade80;
+  --red: #f87171;
+  --text: #f0f0f0;
+  --text-muted: rgba(255,255,255,0.5);
+  --radius: 20px;
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  font-family:'Nunito',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(168,85,247,0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(0,212,170,0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(56,189,248,0.08) 0%, transparent 70%);
+}
+
+/* ── FLOATING PARTICLES ─────────────────────────────── */
+.particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.particle {
+  position:absolute;
+  border-radius:50%;
+  animation: float linear infinite;
+  opacity:0.4;
+}
+@keyframes float {
+  from { transform: translateY(100vh) rotate(0deg); }
+  to   { transform: translateY(-100px) rotate(720deg); }
+}
+
+/* ── SCREENS ──────────────────────────────────────────── */
+.screen { display:none; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
+
+/* ── HOME SCREEN ────────────────────────────────────── */
+#home {
+  text-align:center;
+  gap:28px;
+}
+.logo-badge {
+  background: linear-gradient(135deg, var(--teal), var(--purple));
+  border-radius:24px;
+  padding:12px 28px;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  display:inline-block;
+  margin-bottom:4px;
+}
+.game-title {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(52px, 10vw, 88px);
+  line-height:1;
+  background: linear-gradient(135deg, var(--yellow) 0%, var(--pink) 50%, var(--purple) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter: drop-shadow(0 0 40px rgba(255,107,157,0.4));
+  animation: titlePulse 3s ease-in-out infinite;
+}
+@keyframes titlePulse {
+  0%,100% { filter: drop-shadow(0 0 30px rgba(255,107,157,0.4)); }
+  50% { filter: drop-shadow(0 0 60px rgba(168,85,247,0.6)); }
+}
+.game-subtitle {
+  font-size:18px;
+  color:var(--text-muted);
+  font-weight:600;
+  margin-top:-8px;
+}
+
+/* Mode cards */
+.mode-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap:16px;
+  width:100%;
+  max-width:900px;
+  margin-top:8px;
+}
+.mode-card {
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:var(--radius);
+  padding:28px 22px;
+  cursor:pointer;
+  transition:all 0.3s cubic-bezier(.34,1.56,.64,1);
+  text-align:left;
+  position:relative;
+  overflow:hidden;
+  backdrop-filter:blur(10px);
+}
+.mode-card::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity 0.3s;
+  border-radius:var(--radius);
+}
+.mode-card:hover { transform:translateY(-6px) scale(1.02); border-color:rgba(255,255,255,0.3); }
+.mode-card:hover::before { opacity:1; }
+.mode-card.mode-blitz::before { background:linear-gradient(135deg,rgba(255,93,143,0.2),rgba(255,107,157,0.05)); }
+.mode-card.mode-fill::before  { background:linear-gradient(135deg,rgba(255,217,61,0.2),rgba(251,146,60,0.05)); }
+.mode-card.mode-chain::before { background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(56,189,248,0.05)); }
+.mode-icon { font-size:40px; margin-bottom:12px; display:block; }
+.mode-name {
+  font-family:'Fredoka One',cursive;
+  font-size:24px;
+  margin-bottom:6px;
+}
+.mode-blitz .mode-name  { color:var(--pink); }
+.mode-fill  .mode-name  { color:var(--yellow); }
+.mode-chain .mode-name  { color:var(--purple); }
+.mode-desc { font-size:13px; color:var(--text-muted); line-height:1.5; }
+.mode-badge {
+  position:absolute;
+  top:14px; right:14px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  padding:3px 8px;
+  border-radius:6px;
+}
+.mode-blitz .mode-badge  { background:rgba(255,107,157,0.2); color:var(--pink); }
+.mode-fill  .mode-badge  { background:rgba(255,217,61,0.2); color:var(--yellow); }
+.mode-chain .mode-badge  { background:rgba(168,85,247,0.2); color:var(--purple); }
+
+.leaderboard-btn {
+  background:transparent;
+  border:1.5px solid var(--card-border);
+  border-radius:12px;
+  padding:10px 24px;
+  color:var(--text-muted);
+  font-family:'Nunito',sans-serif;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.leaderboard-btn:hover { border-color:var(--yellow); color:var(--yellow); }
+
+/* ── DIFFICULTY PICKER ──────────────────────────────── */
+#difficulty { gap:24px; text-align:center; }
+.diff-title { font-family:'Fredoka One',cursive; font-size:36px; color:var(--yellow); }
+.diff-grid { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+.diff-btn {
+  background:var(--card);
+  border:2px solid var(--card-border);
+  border-radius:16px;
+  padding:20px 30px;
+  cursor:pointer;
+  transition:all 0.25s;
+  font-family:'Nunito',sans-serif;
+  text-align:center;
+  color:var(--text);
+  min-width:140px;
+}
+.diff-btn:hover, .diff-btn.sel {
+  border-color:currentColor;
+  transform:scale(1.06);
+}
+.diff-btn.easy   { color:var(--green); }
+.diff-btn.medium { color:var(--yellow); }
+.diff-btn.hard   { color:var(--red); }
+.diff-icon  { font-size:32px; margin-bottom:6px; }
+.diff-label { font-family:'Fredoka One',cursive; font-size:20px; }
+.diff-hint  { font-size:11px; margin-top:4px; color:inherit; opacity:0.7; }
+
+/* ── GAME HEADER ────────────────────────────────────── */
+.game-header {
+  width:100%;
+  max-width:820px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+}
+.stat-pill {
+  background:var(--card);
+  border:1px solid var(--card-border);
+  border-radius:40px;
+  padding:8px 18px;
+  font-size:14px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  backdrop-filter:blur(8px);
+}
+.stat-pill .val { font-size:18px; font-family:'Fredoka One',cursive; }
+.timer-bar-wrap {
+  flex:1;
+  height:10px;
+  background:rgba(255,255,255,0.1);
+  border-radius:10px;
+  overflow:hidden;
+}
+.timer-bar {
+  height:100%;
+  background:linear-gradient(90deg, var(--teal), var(--blue));
+  border-radius:10px;
+  transition:width 1s linear;
+}
+.timer-bar.warn { background:linear-gradient(90deg, var(--yellow), var(--orange)); }
+.timer-bar.danger { background:linear-gradient(90deg, var(--red), var(--pink)); animation:pulse 0.4s infinite alternate; }
+@keyframes pulse { to { opacity:0.6; } }
+
+/* ── QUESTION CARD ───────────────────────────────────── */
+#game { gap:16px; }
+.q-wrapper {
+  width:100%;
+  max-width:820px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
+}
+.question-card {
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:var(--radius);
+  padding:32px;
+  width:100%;
+  text-align:center;
+  backdrop-filter:blur(12px);
+  position:relative;
+  overflow:hidden;
+}
+.question-card::after {
+  content:'';
+  position:absolute;
+  top:-60px; right:-60px;
+  width:160px; height:160px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(168,85,247,0.15), transparent 70%);
+  pointer-events:none;
+}
+.q-type-label {
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--teal);
+  margin-bottom:14px;
+}
+.q-prompt {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(22px,4vw,32px);
+  color:var(--text);
+  line-height:1.3;
+  margin-bottom:8px;
+}
+.q-value {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(48px,10vw,80px);
+  background:linear-gradient(135deg,var(--yellow),var(--pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  line-height:1;
+  margin:8px 0 16px;
+}
+.q-instruction {
+  font-size:15px;
+  color:var(--text-muted);
+  font-weight:600;
+}
+
+/* MCQ options */
+.options-grid {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+  width:100%;
+}
+.opt-btn {
+  background:var(--card);
+  border:2px solid var(--card-border);
+  border-radius:16px;
+  padding:18px 12px;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(18px,3.5vw,28px);
+  color:var(--text);
+  cursor:pointer;
+  transition:all 0.2s cubic-bezier(.34,1.56,.64,1);
+  backdrop-filter:blur(8px);
+  position:relative;
+  overflow:hidden;
+}
+.opt-btn::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity 0.2s;
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(56,189,248,0.1));
+}
+.opt-btn:hover:not(:disabled) { transform:scale(1.04) translateY(-2px); border-color:var(--purple); }
+.opt-btn:hover:not(:disabled)::before { opacity:1; }
+.opt-btn.correct { border-color:var(--green) !important; background:rgba(74,222,128,0.15) !important; color:var(--green) !important; }
+.opt-btn.wrong   { border-color:var(--red) !important; background:rgba(248,113,113,0.15) !important; color:var(--red) !important; }
+.opt-btn:disabled { cursor:default; }
+
+/* Text input style */
+.answer-input-wrap {
+  display:flex;
+  gap:12px;
+  width:100%;
+  align-items:center;
+}
+.answer-input {
+  flex:1;
+  background:rgba(255,255,255,0.06);
+  border:2px solid var(--card-border);
+  border-radius:14px;
+  padding:16px 20px;
+  font-family:'Fredoka One',cursive;
+  font-size:28px;
+  color:var(--text);
+  text-align:center;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.answer-input:focus { border-color:var(--teal); }
+.answer-input.correct { border-color:var(--green); background:rgba(74,222,128,0.1); }
+.answer-input.wrong   { border-color:var(--red); background:rgba(248,113,113,0.1); }
+.submit-btn {
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  border:none;
+  border-radius:14px;
+  padding:16px 28px;
+  font-family:'Fredoka One',cursive;
+  font-size:20px;
+  color:#0f0c29;
+  cursor:pointer;
+  transition:transform 0.2s;
+  white-space:nowrap;
+}
+.submit-btn:hover:not(:disabled) { transform:scale(1.06); }
+.submit-btn:disabled { opacity:0.4; cursor:default; }
+
+/* Feedback */
+.feedback-banner {
+  width:100%;
+  border-radius:14px;
+  padding:14px 20px;
+  text-align:center;
+  font-family:'Fredoka One',cursive;
+  font-size:22px;
+  display:none;
+  animation:slideIn 0.3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideIn { from{ transform:translateY(20px);opacity:0; } to{ transform:translateY(0);opacity:1; } }
+.feedback-banner.correct { background:rgba(74,222,128,0.2); border:1.5px solid var(--green); color:var(--green); display:block; }
+.feedback-banner.wrong   { background:rgba(248,113,113,0.2); border:1.5px solid var(--red); color:var(--red); display:block; }
+.feedback-exp { font-size:13px; color:var(--text-muted); margin-top:6px; font-family:'Nunito',sans-serif; font-weight:700; }
+
+/* Progress dots */
+.progress-dots { display:flex; gap:6px; }
+.dot {
+  width:10px; height:10px; border-radius:50%;
+  background:rgba(255,255,255,0.15);
+  transition:all 0.3s;
+}
+.dot.done-correct { background:var(--green); }
+.dot.done-wrong   { background:var(--red); }
+.dot.current      { background:var(--yellow); transform:scale(1.4); }
+
+/* ── FILL BLANKS ─────────────────────────────────────── */
+.fill-row {
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:16px;
+  padding:20px 24px;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(18px,3vw,26px);
+  backdrop-filter:blur(8px);
+  position:relative;
+}
+.fill-given {
+  color:var(--text);
+}
+.fill-input {
+  background:rgba(255,255,255,0.08);
+  border-bottom:3px solid var(--teal);
+  border-top:none;
+  border-left:none;
+  border-right:none;
+  border-radius:4px;
+  padding:4px 12px;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(18px,3vw,26px);
+  color:var(--yellow);
+  text-align:center;
+  outline:none;
+  width:120px;
+  transition:border-color 0.2s;
+}
+.fill-input:focus { border-bottom-color:var(--purple); }
+.fill-input.correct { border-color:var(--green); color:var(--green); }
+.fill-input.wrong   { border-color:var(--red); color:var(--red); }
+.fill-equals { color:var(--text-muted); }
+
+/* ── CHAIN GAME ─────────────────────────────────────── */
+.chain-wrap {
+  width:100%;
+  max-width:820px;
+}
+.chain-question {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(24px,5vw,40px);
+  text-align:center;
+  margin:16px 0 24px;
+}
+.chain-options {
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.chain-opt {
+  background:var(--card);
+  border:2px solid var(--card-border);
+  border-radius:14px;
+  padding:14px 20px;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(16px,3vw,22px);
+  cursor:pointer;
+  color:var(--text);
+  transition:all 0.2s;
+  backdrop-filter:blur(8px);
+}
+.chain-opt:hover:not(:disabled) { border-color:var(--purple); transform:scale(1.05); }
+.chain-opt.correct { border-color:var(--green); color:var(--green); background:rgba(74,222,128,0.1); }
+.chain-opt.wrong   { border-color:var(--red); color:var(--red); background:rgba(248,113,113,0.1); animation:shake 0.4s ease; }
+.chain-score-display {
+  font-family:'Fredoka One',cursive;
+  font-size:60px;
+  text-align:center;
+  color:var(--yellow);
+  text-shadow: 0 0 40px rgba(255,217,61,0.6);
+}
+.chain-label { text-align:center; color:var(--text-muted); font-weight:700; font-size:14px; margin-top:-8px; }
+@keyframes shake {
+  0%,100%{ transform:translateX(0); }
+  25%{ transform:translateX(-8px); }
+  75%{ transform:translateX(8px); }
+}
+
+/* ── RESULTS ──────────────────────────────────────────── */
+#results { gap:24px; text-align:center; }
+.result-trophy { font-size:80px; animation:bounce 1s ease infinite alternate; }
+@keyframes bounce { to { transform:translateY(-12px); } }
+.result-title {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(32px,7vw,52px);
+  background:linear-gradient(135deg,var(--yellow),var(--pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.result-score-big {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(60px,14vw,100px);
+  color:var(--yellow);
+  line-height:1;
+  text-shadow:0 0 60px rgba(255,217,61,0.5);
+}
+.result-stats {
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.result-stat {
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:16px;
+  padding:16px 24px;
+  min-width:120px;
+  backdrop-filter:blur(8px);
+}
+.result-stat-val { font-family:'Fredoka One',cursive; font-size:32px; }
+.result-stat-lbl { font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+.result-grade {
+  font-family:'Fredoka One',cursive;
+  font-size:22px;
+  padding:10px 28px;
+  border-radius:40px;
+  display:inline-block;
+}
+.btn-row { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+.btn-primary {
+  background:linear-gradient(135deg,var(--teal),var(--purple));
+  border:none; border-radius:14px;
+  padding:14px 32px;
+  font-family:'Fredoka One',cursive;
+  font-size:20px; color:#fff;
+  cursor:pointer;
+  transition:transform 0.2s, box-shadow 0.2s;
+  box-shadow:0 4px 24px rgba(0,212,170,0.3);
+}
+.btn-primary:hover { transform:scale(1.06); box-shadow:0 6px 32px rgba(0,212,170,0.5); }
+.btn-secondary {
+  background:transparent;
+  border:2px solid var(--card-border);
+  border-radius:14px;
+  padding:14px 32px;
+  font-family:'Fredoka One',cursive;
+  font-size:20px; color:var(--text-muted);
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-secondary:hover { border-color:var(--text-muted); color:var(--text); }
+
+/* ── FORMULA STRIP ───────────────────────────────────── */
+.formula-strip {
+  background:rgba(0,212,170,0.05);
+  border:1px solid rgba(0,212,170,0.2);
+  border-radius:12px;
+  padding:10px 16px;
+  font-size:12px;
+  color:var(--teal);
+  font-weight:700;
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  justify-content:center;
+  max-width:820px;
+  width:100%;
+}
+
+/* ── COMBO DISPLAY ────────────────────────────────────── */
+.combo-badge {
+  position:fixed;
+  top:20px; right:20px;
+  background:linear-gradient(135deg,var(--yellow),var(--orange));
+  border-radius:14px;
+  padding:8px 18px;
+  font-family:'Fredoka One',cursive;
+  font-size:20px;
+  color:#0f0c29;
+  z-index:100;
+  transform:scale(0);
+  transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
+}
+.combo-badge.show { transform:scale(1); }
+
+/* ── POINTS POP ─────────────────────────────────────── */
+.points-pop {
+  position:fixed;
+  font-family:'Fredoka One',cursive;
+  font-size:28px;
+  pointer-events:none;
+  z-index:200;
+  animation:pointsPop 1.2s ease forwards;
+}
+@keyframes pointsPop {
+  0%   { transform:translateY(0) scale(0.5); opacity:1; }
+  50%  { transform:translateY(-60px) scale(1.2); opacity:1; }
+  100% { transform:translateY(-120px) scale(0.8); opacity:0; }
+}
+
+/* ── BACK BTN ────────────────────────────────────────── */
+.back-btn {
+  position:fixed;
+  top:16px; left:16px;
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:12px;
+  padding:8px 16px;
+  font-family:'Nunito',sans-serif;
+  font-size:14px;
+  font-weight:700;
+  color:var(--text-muted);
+  cursor:pointer;
+  z-index:50;
+  transition:all 0.2s;
+  backdrop-filter:blur(8px);
+  display:none;
+}
+.back-btn:hover { color:var(--text); border-color:rgba(255,255,255,0.3); }
+.back-btn.visible { display:block; }
+
+/* ── HOW-TO-CONVERT reference ─────────────────────────── */
+.reference-strip {
+  width:100%;
+  max-width:820px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.ref-card {
+  background:var(--card);
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding:12px;
+  text-align:center;
+  backdrop-filter:blur(8px);
+  font-size:12px;
+}
+.ref-title { font-weight:800; margin-bottom:6px; font-size:11px; letter-spacing:1px; text-transform:uppercase; }
+.ref-rule { font-size:13px; font-weight:700; margin:2px 0; }
+.ref-eg { font-size:11px; color:var(--text-muted); }
+
+/* ── LEVEL SELECT ─────────────────────────────────────── */
+.next-btn {
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  border:none; border-radius:14px;
+  padding:14px 36px;
+  font-family:'Fredoka One',cursive;
+  font-size:22px; color:#0f0c29;
+  cursor:pointer;
+  width:100%;
+  max-width:400px;
+  transition:transform 0.2s;
+}
+.next-btn:hover { transform:scale(1.04); }
+
+/* Responsive */
+@media(max-width:600px){
+  .options-grid { grid-template-columns:1fr; }
+  .reference-strip { grid-template-columns:1fr; }
+  .mode-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Floating Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Back Button -->
+<button class="back-btn" id="backBtn" onclick="goHome()">← Menu</button>
+
+<!-- Combo Badge -->
+<div class="combo-badge" id="comboBadge">🔥 COMBO x<span id="comboCount">2</span></div>
+
+<!-- ════════════════════════════════════
+     HOME
+════════════════════════════════════ -->
+<div class="screen active" id="home">
+  <div class="logo-badge">Year 8 Mathematics</div>
+  <div class="game-title">Spiral Revision</div>
+  <div class="game-subtitle" id="homeSubtitle">Term 2, 2026</div>
+
+  <!-- Set Selector -->
+  <div style="width:100%;max-width:700px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);border-radius:20px;padding:20px 24px;backdrop-filter:blur(10px);">
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:14px;">📅 Select Your Lesson Set</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
+        <label style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;">Week</label>
+        <select id="weekSelect" onchange="updateSetOptions()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;outline:none;">
+          <option value="1">Week 1</option>
+          <option value="2">Week 2</option>
+          <option value="3">Week 3</option>
+          <option value="4">Week 4</option>
+          <option value="5">Week 5</option>
+          <option value="6">Week 6</option>
+          <option value="7">Week 7</option>
+          <option value="8">Week 8</option>
+          <option value="9">Week 9</option>
+          <option value="10">Week 10</option>
+          <option value="11">Week 11</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
+        <label style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;">Lesson Set</label>
+        <select id="setSelect" onchange="updateSelectedSet()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;outline:none;">
+          <option value="1">Set 1</option>
+          <option value="2">Set 2</option>
+          <option value="3">Set 3</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px;">
+        <label style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;">Selected</label>
+        <div id="selectedSetLabel" style="background:linear-gradient(135deg,rgba(0,212,170,0.2),rgba(168,85,247,0.2));border:1.5px solid var(--teal);border-radius:10px;padding:10px 14px;font-family:'Fredoka One',cursive;font-size:16px;color:var(--teal);">Week 1 · Set 1</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mode-grid">
+    <div class="mode-card mode-blitz" onclick="launchDirect('blitz')">
+      <span class="mode-badge">MCQ</span>
+      <span class="mode-icon">⚡</span>
+      <div class="mode-name">Blitz Quiz</div>
+      <div class="mode-desc">Answer 15 questions with multiple choice options. Select the correct answer!</div>
+    </div>
+
+    <div class="mode-card mode-fill" onclick="launchDirect('fill')">
+      <span class="mode-badge">TYPE IT</span>
+      <span class="mode-icon">✍️</span>
+      <div class="mode-name">Fill the Gaps</div>
+      <div class="mode-desc">Type the answer to each question. Show what you know!</div>
+    </div>
+    <div class="mode-card mode-chain" onclick="launchDirect('chain')">
+      <span class="mode-badge">STREAK</span>
+      <span class="mode-icon">🔥</span>
+      <div class="mode-name">Chain Reaction</div>
+      <div class="mode-desc">Build the longest correct streak you can. One wrong answer ends the chain!</div>
+    </div>
+  </div>
+
+  <!-- Teacher Controls -->
+  <div style="margin-top:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;">
+    <span style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;">⚙️ Teacher Controls</span>
+    <button id="timerToggleBtn" onclick="toggleTimer()" style="background:rgba(0,212,170,0.15);border:1.5px solid var(--teal);border-radius:10px;padding:8px 18px;color:var(--teal);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.2s;">⏱ Timer: ON</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     BLITZ / FILL GAME SCREEN
+════════════════════════════════════ -->
+<div class="screen" id="game">
+  <div class="game-header" id="gameHeader">
+    <div class="stat-pill">⚡ <span class="val" id="scoreVal">0</span> pts</div>
+    <div class="timer-bar-wrap" id="timerBarWrap"><div class="timer-bar" id="timerBar" style="width:100%"></div></div>
+    <div class="stat-pill" id="timerSecsPill">⏱ <span class="val" id="timerSecs">–</span>s</div>
+    <div class="stat-pill">Q <span class="val" id="qNumVal">1</span>/15</div>
+  </div>
+  <div class="progress-dots" id="progressDots"></div>
+  <div class="q-wrapper" id="qWrapper">
+    <!-- injected by JS -->
+  </div>
+  <div class="formula-strip" id="formulaStrip" style="display:none"></div>
+</div>
+
+
+
+<!-- ════════════════════════════════════
+     CHAIN GAME SCREEN
+════════════════════════════════════ -->
+<div class="screen" id="chain-game">
+  <div class="game-header" style="justify-content:center">
+    <div class="stat-pill">🔥 Streak: <span class="val" id="streakVal">0</span></div>
+    <div class="stat-pill">🏆 Best: <span class="val" id="bestVal">0</span></div>
+  </div>
+  <div class="chain-wrap">
+    <div class="chain-score-display" id="chainScore">0</div>
+    <div class="chain-label">CURRENT STREAK</div>
+    <div class="chain-question" id="chainQ"></div>
+    <div class="chain-options" id="chainOpts"></div>
+    <div class="feedback-banner" id="chainFeedback"></div>
+    <!-- Step-by-step answer panel for chain mode -->
+    <div id="chainStepsPanel" style="display:none;margin-top:12px;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.35);border-radius:14px;padding:16px 20px;text-align:left;max-width:700px;margin-left:auto;margin-right:auto;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:8px;">📋 Step-by-Step Answer</div>
+      <div id="chainStepsText" style="font-size:14px;color:var(--text);font-family:'Nunito',sans-serif;font-weight:700;line-height:1.7;"></div>
+    </div>
+    <button id="chainNextBtn" onclick="chainNext()" style="display:none;margin-top:16px;background:linear-gradient(135deg,var(--teal),var(--purple));border:none;border-radius:14px;padding:14px 40px;font-family:'Fredoka One',cursive;font-size:22px;color:#fff;cursor:pointer;transition:transform 0.2s;box-shadow:0 4px 24px rgba(0,212,170,0.35);">
+      Next Question →
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     RESULTS
+════════════════════════════════════ -->
+<div class="screen" id="results">
+  <div class="result-trophy" id="resultTrophy">🏆</div>
+  <div class="result-title" id="resultTitle">Fantastic!</div>
+  <div class="result-score-big" id="resultScore">0</div>
+  <div style="color:var(--text-muted);font-weight:700;margin-top:-12px">POINTS</div>
+  <div class="result-stats" id="resultStats"></div>
+  <div class="result-grade" id="resultGrade"></div>
+  <div class="btn-row">
+    <button class="btn-primary" id="replayBtn" onclick="replayMode()">Play Again</button>
+    <button class="btn-secondary" onclick="goHome()">Menu</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// QUESTION DATA  —  Set 1: Week 1 Lesson 1, Term 2, 2026
+// Each question: { q, answer, steps, opts (3 wrong distractors) }
+// ═══════════════════════════════════════════════════════════
+const ALL_QUESTIONS = [
+  {
+    "id": 1,
+    "q": "2³",
+    "answer": "8",
+    "steps": "2 × 2 × 2 = 8",
+    "distractors": [
+      "7",
+      "9",
+      "16"
+    ]
+  },
+  {
+    "id": 2,
+    "q": "0.25 = ? (%)",
+    "answer": "25%",
+    "steps": "0.25 × 100% = 25%",
+    "distractors": [
+      "30%",
+      "20%",
+      "50%"
+    ]
+  },
+  {
+    "id": 3,
+    "q": "6 × 7 − 8",
+    "answer": "34",
+    "steps": "6 × 7 = 42 | 42 − 8 = 34",
+    "distractors": [
+      "33",
+      "35",
+      "68"
+    ]
+  },
+  {
+    "id": 4,
+    "q": "36 ÷ 6",
+    "answer": "6",
+    "steps": "36 ÷ 6 = 6",
+    "distractors": [
+      "5",
+      "7",
+      "12"
+    ]
+  },
+  {
+    "id": 5,
+    "q": "√49",
+    "answer": "7",
+    "steps": "7 × 7 = 49 | √49 = 7",
+    "distractors": [
+      "6",
+      "8",
+      "14"
+    ]
+  },
+  {
+    "id": 6,
+    "q": "1/2 = ? (decimal)",
+    "answer": "0.5",
+    "steps": "1 ÷ 2 = 0.5",
+    "distractors": [
+      "0.6",
+      "0.4",
+      "5"
+    ]
+  },
+  {
+    "id": 7,
+    "q": "Round 5.678 to 1dp",
+    "answer": "round up → 5.7",
+    "steps": "Look at next digit (7) → round up → 5.7",
+    "distractors": [
+      "Option A",
+      "Option B",
+      "Option C"
+    ]
+  },
+  {
+    "id": 8,
+    "q": "3² + 4²",
+    "answer": "25",
+    "steps": "9 + 16 = 25",
+    "distractors": [
+      "24",
+      "26",
+      "50"
+    ]
+  },
+  {
+    "id": 9,
+    "q": "√25",
+    "answer": "5",
+    "steps": "5 × 5 = 25 | √25 = 5",
+    "distractors": [
+      "4",
+      "6",
+      "10"
+    ]
+  },
+  {
+    "id": 10,
+    "q": "2.5 km → m",
+    "answer": "2500 m",
+    "steps": "1 km = 1000 m | 2.5 × 1000 = 2500 m",
+    "distractors": [
+      "2700 m",
+      "2300 m",
+      "250 m"
+    ]
+  },
+  {
+    "id": 11,
+    "q": "0.6 = ? (%)",
+    "answer": "60%",
+    "steps": "0.6 × 100% = 60%",
+    "distractors": [
+      "65%",
+      "55%",
+      "120%"
+    ]
+  },
+  {
+    "id": 12,
+    "q": "8 × 5 − 6",
+    "answer": "34",
+    "steps": "8 × 5 = 40 | 40 − 6 = 34",
+    "distractors": [
+      "33",
+      "35",
+      "68"
+    ]
+  },
+  {
+    "id": 13,
+    "q": "5x + 3x",
+    "answer": "8x",
+    "steps": "5 + 3 = 8 → 8x",
+    "distractors": [
+      "7x",
+      "9x",
+      "11x"
+    ]
+  },
+  {
+    "id": 14,
+    "q": "Evaluate 4x + 1 when x = 2",
+    "answer": "9",
+    "steps": "4(2) + 1 = 8 + 1 = 9",
+    "distractors": [
+      "8",
+      "10",
+      "18"
+    ]
+  },
+  {
+    "id": 15,
+    "q": "450 g → kg",
+    "answer": "0.45 kg",
+    "steps": "1 kg = 1000 g | 450 ÷ 1000 = 0.45 kg",
+    "distractors": [
+      "0.55 kg",
+      "0.65 kg",
+      "4.5 kg"
+    ]
+  }
+];
+
+const ALL_SETS = [
+  {
+    "week": 1,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "2³",
+        "answer": "8",
+        "steps": "2 × 2 × 2 = 8",
+        "distractors": [
+          "7",
+          "9",
+          "16"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.25 = ? (%)",
+        "answer": "25%",
+        "steps": "0.25 × 100% = 25%",
+        "distractors": [
+          "30%",
+          "20%",
+          "50%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "6 × 7 − 8",
+        "answer": "34",
+        "steps": "6 × 7 = 42 | 42 − 8 = 34",
+        "distractors": [
+          "33",
+          "35",
+          "68"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "36 ÷ 6",
+        "answer": "6",
+        "steps": "36 ÷ 6 = 6",
+        "distractors": [
+          "5",
+          "7",
+          "12"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√49",
+        "answer": "7",
+        "steps": "7 × 7 = 49 | √49 = 7",
+        "distractors": [
+          "6",
+          "8",
+          "14"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "1/2 = ? (decimal)",
+        "answer": "0.5",
+        "steps": "1 ÷ 2 = 0.5",
+        "distractors": [
+          "0.6",
+          "0.4",
+          "5"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Round 5.678 to 1dp",
+        "answer": "round up → 5.7",
+        "steps": "Look at next digit (7) → round up → 5.7",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "3² + 4²",
+        "answer": "25",
+        "steps": "9 + 16 = 25",
+        "distractors": [
+          "24",
+          "26",
+          "50"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "√25",
+        "answer": "5",
+        "steps": "5 × 5 = 25 | √25 = 5",
+        "distractors": [
+          "4",
+          "6",
+          "10"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "2.5 km → m",
+        "answer": "2500 m",
+        "steps": "1 km = 1000 m | 2.5 × 1000 = 2500 m",
+        "distractors": [
+          "2700 m",
+          "2300 m",
+          "250 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.6 = ? (%)",
+        "answer": "60%",
+        "steps": "0.6 × 100% = 60%",
+        "distractors": [
+          "65%",
+          "55%",
+          "120%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "8 × 5 − 6",
+        "answer": "34",
+        "steps": "8 × 5 = 40 | 40 − 6 = 34",
+        "distractors": [
+          "33",
+          "35",
+          "68"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "5x + 3x",
+        "answer": "8x",
+        "steps": "5 + 3 = 8 → 8x",
+        "distractors": [
+          "7x",
+          "9x",
+          "11x"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Evaluate 4x + 1 when x = 2",
+        "answer": "9",
+        "steps": "4(2) + 1 = 8 + 1 = 9",
+        "distractors": [
+          "8",
+          "10",
+          "18"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "450 g → kg",
+        "answer": "0.45 kg",
+        "steps": "1 kg = 1000 g | 450 ÷ 1000 = 0.45 kg",
+        "distractors": [
+          "0.55 kg",
+          "0.65 kg",
+          "4.5 kg"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 1,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "5²",
+        "answer": "25",
+        "steps": "5 × 5 = 25",
+        "distractors": [
+          "24",
+          "26",
+          "50"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "40% = ? (decimal)",
+        "answer": "0.4",
+        "steps": "40 ÷ 100 = 0.4",
+        "distractors": [
+          "0.5",
+          "0.3",
+          "4"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "9 × (4 + 3)",
+        "answer": "63",
+        "steps": "4 + 3 = 7 | 9 × 7 = 63",
+        "distractors": [
+          "62",
+          "64",
+          "126"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "72 ÷ 8",
+        "answer": "9",
+        "steps": "72 ÷ 8 = 9",
+        "distractors": [
+          "8",
+          "10",
+          "18"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√81",
+        "answer": "9",
+        "steps": "9 × 9 = 81 | √81 = 9",
+        "distractors": [
+          "8",
+          "10",
+          "18"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "3/4 = ? (decimal)",
+        "answer": "0.75",
+        "steps": "3 ÷ 4 = 0.75",
+        "distractors": [
+          "0.85",
+          "0.65",
+          "7.5"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "2.5 km → m",
+        "answer": "2500 m",
+        "steps": "1 km = 1000 m | 2.5 × 1000 = 2500 m",
+        "distractors": [
+          "2700 m",
+          "2300 m",
+          "250 m"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "6² + 2²",
+        "answer": "40",
+        "steps": "36 + 4 = 40",
+        "distractors": [
+          "39",
+          "41",
+          "80"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "√64",
+        "answer": "8",
+        "steps": "8 × 8 = 64 | √64 = 8",
+        "distractors": [
+          "7",
+          "9",
+          "16"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Round 4.36 to 1dp",
+        "answer": "round up → 4.4",
+        "steps": "Look at next digit (6) → round up → 4.4",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.3 = ? (%)",
+        "answer": "30%",
+        "steps": "0.3 × 100% = 30%",
+        "distractors": [
+          "35%",
+          "25%",
+          "60%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "8 × 6 − 5",
+        "answer": "43",
+        "steps": "48 − 5 = 43",
+        "distractors": [
+          "42",
+          "44",
+          "86"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "7x + 2x",
+        "answer": "9x",
+        "steps": "9x",
+        "distractors": [
+          "8x",
+          "10x",
+          "12x"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Evaluate 2x + 4 when x = 3",
+        "answer": "10",
+        "steps": "2(3) + 4 = 10",
+        "distractors": [
+          "9",
+          "11",
+          "20"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "750 mL → L",
+        "answer": "0.75 L",
+        "steps": "1 L = 1000 mL | 750 ÷ 1000 = 0.75 L",
+        "distractors": [
+          "1 L",
+          "0.5 L",
+          "1.5 L"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 1,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "10²",
+        "answer": "100",
+        "steps": "100",
+        "distractors": [
+          "99",
+          "101",
+          "200"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.6 = ? (%)",
+        "answer": "60%",
+        "steps": "0.6 × 100% = 60%",
+        "distractors": [
+          "65%",
+          "55%",
+          "120%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "8 × 6 − 10",
+        "answer": "38",
+        "steps": "48 − 10 = 38",
+        "distractors": [
+          "37",
+          "39",
+          "76"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "45 ÷ 5",
+        "answer": "9",
+        "steps": "9",
+        "distractors": [
+          "8",
+          "10",
+          "18"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√64",
+        "answer": "8",
+        "steps": "8",
+        "distractors": [
+          "7",
+          "9",
+          "16"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "1/4 = ? (decimal)",
+        "answer": "0.25",
+        "steps": "0.25",
+        "distractors": [
+          "0.35",
+          "0.15",
+          "2.5"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "3:15 → 4:00",
+        "answer": "45 minutes",
+        "steps": "45 minutes",
+        "distractors": [
+          "30 minutes",
+          "90 minutes",
+          "45 minutes"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "7² + 3²",
+        "answer": "58",
+        "steps": "49 + 9 = 58",
+        "distractors": [
+          "57",
+          "59",
+          "116"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "√49",
+        "answer": "7",
+        "steps": "7",
+        "distractors": [
+          "6",
+          "8",
+          "14"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "1.8 km → m",
+        "answer": "1800 m",
+        "steps": "1 km = 1000 m | 1.8 × 1000 = 1800 m",
+        "distractors": [
+          "2000 m",
+          "1600 m",
+          "180 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.45 = ? (%)",
+        "answer": "45%",
+        "steps": "0.45 × 100% = 45%",
+        "distractors": [
+          "50%",
+          "40%",
+          "90%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "9 × 5 − 12",
+        "answer": "33",
+        "steps": "45 − 12 = 33",
+        "distractors": [
+          "32",
+          "34",
+          "66"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "6x + 4x",
+        "answer": "10x",
+        "steps": "10x",
+        "distractors": [
+          "9x",
+          "11x",
+          "13x"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Evaluate 3x + 2 when x = 4",
+        "answer": "14",
+        "steps": "3(4) + 2 = 14",
+        "distractors": [
+          "13",
+          "15",
+          "28"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "1200 g → kg",
+        "answer": "1.2 kg",
+        "steps": "1 kg = 1000 g | 1200 ÷ 1000 = 1.2 kg",
+        "distractors": [
+          "1.3 kg",
+          "1.4 kg",
+          "12 kg"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 2,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "3²",
+        "answer": "9",
+        "steps": "9",
+        "distractors": [
+          "8",
+          "10",
+          "18"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "25% = ? (decimal)",
+        "answer": "0.25",
+        "steps": "0.25",
+        "distractors": [
+          "0.35",
+          "0.15",
+          "2.5"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "7 × 5 + 6",
+        "answer": "41",
+        "steps": "35 + 6 = 41",
+        "distractors": [
+          "40",
+          "42",
+          "82"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "64 ÷ 8",
+        "answer": "8",
+        "steps": "8",
+        "distractors": [
+          "7",
+          "9",
+          "16"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√36",
+        "answer": "6",
+        "steps": "6",
+        "distractors": [
+          "5",
+          "7",
+          "12"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "2x + 3x",
+        "answer": "5x",
+        "steps": "5x",
+        "distractors": [
+          "4x",
+          "6x",
+          "8x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "5x − 2x",
+        "answer": "3x",
+        "steps": "3x",
+        "distractors": [
+          "2x",
+          "4x",
+          "6x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Evaluate 3x + 4 when x = 2",
+        "answer": "10",
+        "steps": "10",
+        "distractors": [
+          "9",
+          "11",
+          "20"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "1.2 km → m",
+        "answer": "1200 m",
+        "steps": "1 km = 1000 m | 1200 m",
+        "distractors": [
+          "1400 m",
+          "1000 m",
+          "120 m"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Round 3.47 to 1dp",
+        "answer": "3.5",
+        "steps": "3.5",
+        "distractors": [
+          "3.6",
+          "3.4",
+          "35"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.8 = ? (%)",
+        "answer": "80%",
+        "steps": "80%",
+        "distractors": [
+          "85%",
+          "75%",
+          "160%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "6 × 8 − 7",
+        "answer": "41",
+        "steps": "48 − 7 = 41",
+        "distractors": [
+          "40",
+          "42",
+          "82"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve x + 5 = 9",
+        "answer": "x = 4",
+        "steps": "x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 2x = 10",
+        "answer": "x = 5",
+        "steps": "x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "450 mL → L",
+        "answer": "0.45 L",
+        "steps": "1 L = 1000 mL | 0.45 L",
+        "distractors": [
+          "0.7 L",
+          "0.2 L",
+          "0.9 L"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 2,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "4²",
+        "answer": "16",
+        "steps": "16",
+        "distractors": [
+          "15",
+          "17",
+          "32"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.5 = ? (%)",
+        "answer": "50%",
+        "steps": "50%",
+        "distractors": [
+          "55%",
+          "45%",
+          "100%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "6 × 8 − 4",
+        "answer": "44",
+        "steps": "44",
+        "distractors": [
+          "43",
+          "45",
+          "88"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "81 ÷ 9",
+        "answer": "9",
+        "steps": "9",
+        "distractors": [
+          "8",
+          "10",
+          "18"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√49",
+        "answer": "7",
+        "steps": "7",
+        "distractors": [
+          "6",
+          "8",
+          "14"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "7x + 2x",
+        "answer": "9x",
+        "steps": "9x",
+        "distractors": [
+          "8x",
+          "10x",
+          "12x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "9x − 3x",
+        "answer": "6x",
+        "steps": "6x",
+        "distractors": [
+          "5x",
+          "7x",
+          "9x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Evaluate 2x + 5 when x = 3",
+        "answer": "11",
+        "steps": "11",
+        "distractors": [
+          "10",
+          "12",
+          "22"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "750 mL → L",
+        "answer": "0.75 L",
+        "steps": "0.75 L",
+        "distractors": [
+          "1 L",
+          "0.5 L",
+          "1.5 L"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Round 5.62 to 1dp",
+        "answer": "5.6",
+        "steps": "5.6",
+        "distractors": [
+          "5.7",
+          "5.5",
+          "56"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.2 = ? (%)",
+        "answer": "20%",
+        "steps": "20%",
+        "distractors": [
+          "25%",
+          "15%",
+          "40%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "9 × 4 + 3",
+        "answer": "39",
+        "steps": "39",
+        "distractors": [
+          "38",
+          "40",
+          "78"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve x − 4 = 6",
+        "answer": "x = 10",
+        "steps": "x = 10",
+        "distractors": [
+          "x=9",
+          "x=11",
+          "x=20"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 3x = 15",
+        "answer": "x = 5",
+        "steps": "x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "1200 g → kg",
+        "answer": "1.2 kg",
+        "steps": "1.2 kg",
+        "distractors": [
+          "1.3 kg",
+          "1.4 kg",
+          "12 kg"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 2,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "2⁴",
+        "answer": "16",
+        "steps": "16",
+        "distractors": [
+          "15",
+          "17",
+          "32"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.2 = ? (%)",
+        "answer": "20%",
+        "steps": "20%",
+        "distractors": [
+          "25%",
+          "15%",
+          "40%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "9 × 4 + 3",
+        "answer": "39",
+        "steps": "39",
+        "distractors": [
+          "38",
+          "40",
+          "78"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "56 ÷ 7",
+        "answer": "8",
+        "steps": "8",
+        "distractors": [
+          "7",
+          "9",
+          "16"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√81",
+        "answer": "9",
+        "steps": "9",
+        "distractors": [
+          "8",
+          "10",
+          "18"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "6x + x",
+        "answer": "7x",
+        "steps": "7x",
+        "distractors": [
+          "6x",
+          "8x",
+          "10x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "10x − 4x",
+        "answer": "6x",
+        "steps": "6x",
+        "distractors": [
+          "5x",
+          "7x",
+          "9x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Evaluate 5x − 3 when x = 4",
+        "answer": "17",
+        "steps": "17",
+        "distractors": [
+          "16",
+          "18",
+          "34"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "2:10 → 2:50",
+        "answer": "40 minutes",
+        "steps": "40 minutes",
+        "distractors": [
+          "30 minutes",
+          "90 minutes",
+          "45 minutes"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "1.5 km → m",
+        "answer": "1500 m",
+        "steps": "1500 m",
+        "distractors": [
+          "1700 m",
+          "1300 m",
+          "150 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.35 = ? (%)",
+        "answer": "35%",
+        "steps": "35%",
+        "distractors": [
+          "40%",
+          "30%",
+          "70%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "8 × 7 − 9",
+        "answer": "47",
+        "steps": "47",
+        "distractors": [
+          "46",
+          "48",
+          "94"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve x + 3 = 11",
+        "answer": "x = 8",
+        "steps": "x = 8",
+        "distractors": [
+          "x=7",
+          "x=9",
+          "x=16"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 4x = 20",
+        "answer": "x = 5",
+        "steps": "x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "2.4 km → m",
+        "answer": "2400 m",
+        "steps": "2400 m",
+        "distractors": [
+          "2600 m",
+          "2200 m",
+          "240 m"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 3,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "6²",
+        "answer": "36",
+        "steps": "36",
+        "distractors": [
+          "35",
+          "37",
+          "72"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.75 = ? (%)",
+        "answer": "75%",
+        "steps": "0.75 × 100% = 75%",
+        "distractors": [
+          "80%",
+          "70%",
+          "150%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "8 × 7 − 9",
+        "answer": "47",
+        "steps": "56 − 9 = 47",
+        "distractors": [
+          "46",
+          "48",
+          "94"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "90 ÷ 10",
+        "answer": "9",
+        "steps": "9",
+        "distractors": [
+          "8",
+          "10",
+          "18"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√100",
+        "answer": "10",
+        "steps": "10",
+        "distractors": [
+          "9",
+          "11",
+          "20"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "3x + 5x",
+        "answer": "8x",
+        "steps": "8x",
+        "distractors": [
+          "7x",
+          "9x",
+          "11x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "9x − 4x",
+        "answer": "5x",
+        "steps": "5x",
+        "distractors": [
+          "4x",
+          "6x",
+          "8x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 3(x + 2)",
+        "answer": "3x + 6",
+        "steps": "3 × x + 3 × 2 = 3x + 6",
+        "distractors": [
+          "3x+8",
+          "4x+6",
+          "2x+6"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate 2x + 7 when x = 5",
+        "answer": "17",
+        "steps": "2(5) + 7 = 10 + 7 = 17",
+        "distractors": [
+          "16",
+          "18",
+          "34"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "2.3 km → m",
+        "answer": "2300 m",
+        "steps": "1 km = 1000 m | 2300 m",
+        "distractors": [
+          "2500 m",
+          "2100 m",
+          "230 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.45 = ? (%)",
+        "answer": "45%",
+        "steps": "45%",
+        "distractors": [
+          "50%",
+          "40%",
+          "90%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "7 × 9 − 8",
+        "answer": "55",
+        "steps": "63 − 8 = 55",
+        "distractors": [
+          "54",
+          "56",
+          "110"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve x + 6 = 15",
+        "answer": "x = 9",
+        "steps": "x = 9",
+        "distractors": [
+          "x=8",
+          "x=10",
+          "x=18"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 3x = 21",
+        "answer": "x = 7",
+        "steps": "x = 7",
+        "distractors": [
+          "x=6",
+          "x=8",
+          "x=14"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "600 mL → L",
+        "answer": "0.6 L",
+        "steps": "1 L = 1000 mL | 0.6 L",
+        "distractors": [
+          "0.85 L",
+          "0.35 L",
+          "1.2 L"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 3,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "7²",
+        "answer": "49",
+        "steps": "49",
+        "distractors": [
+          "48",
+          "50",
+          "98"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.4 = ? (%)",
+        "answer": "40%",
+        "steps": "40%",
+        "distractors": [
+          "45%",
+          "35%",
+          "80%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "9 × 6 + 5",
+        "answer": "59",
+        "steps": "54 + 5 = 59",
+        "distractors": [
+          "58",
+          "60",
+          "118"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "84 ÷ 7",
+        "answer": "12",
+        "steps": "12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√121",
+        "answer": "11",
+        "steps": "11",
+        "distractors": [
+          "10",
+          "12",
+          "22"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "4x + 6x",
+        "answer": "10x",
+        "steps": "10x",
+        "distractors": [
+          "9x",
+          "11x",
+          "13x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "12x − 5x",
+        "answer": "7x",
+        "steps": "7x",
+        "distractors": [
+          "6x",
+          "8x",
+          "10x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 4(x + 3)",
+        "answer": "4x + 12",
+        "steps": "4x + 12",
+        "distractors": [
+          "4x+14",
+          "5x+12",
+          "3x+12"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate 3x − 2 when x = 6",
+        "answer": "16",
+        "steps": "18 − 2 = 16",
+        "distractors": [
+          "15",
+          "17",
+          "32"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "1.75 km → m",
+        "answer": "1750 m",
+        "steps": "1750 m",
+        "distractors": [
+          "1950 m",
+          "1550 m",
+          "175 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.9 = ? (%)",
+        "answer": "90%",
+        "steps": "90%",
+        "distractors": [
+          "95%",
+          "85%",
+          "180%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "8 × 8 − 6",
+        "answer": "58",
+        "steps": "64 − 6 = 58",
+        "distractors": [
+          "57",
+          "59",
+          "116"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve x − 7 = 5",
+        "answer": "x = 12",
+        "steps": "x = 12",
+        "distractors": [
+          "x=11",
+          "x=13",
+          "x=24"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 5x = 25",
+        "answer": "x = 5",
+        "steps": "x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "250 g → kg",
+        "answer": "0.25 kg",
+        "steps": "1 kg = 1000 g | 0.25 kg",
+        "distractors": [
+          "0.35 kg",
+          "0.45 kg",
+          "2.5 kg"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 3,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "8²",
+        "answer": "64",
+        "steps": "64",
+        "distractors": [
+          "63",
+          "65",
+          "128"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.65 = ? (%)",
+        "answer": "65%",
+        "steps": "65%",
+        "distractors": [
+          "70%",
+          "60%",
+          "130%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "6 × 9 + 4",
+        "answer": "58",
+        "steps": "54 + 4 = 58",
+        "distractors": [
+          "57",
+          "59",
+          "116"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "96 ÷ 12",
+        "answer": "8",
+        "steps": "8",
+        "distractors": [
+          "7",
+          "9",
+          "16"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√144",
+        "answer": "12",
+        "steps": "12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "5x + 7x",
+        "answer": "12x",
+        "steps": "12x",
+        "distractors": [
+          "11x",
+          "13x",
+          "15x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "15x − 9x",
+        "answer": "6x",
+        "steps": "6x",
+        "distractors": [
+          "5x",
+          "7x",
+          "9x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 2(x + 5)",
+        "answer": "2x + 10",
+        "steps": "2x + 10",
+        "distractors": [
+          "2x+12",
+          "3x+10",
+          "1x+10"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate 4x + 1 when x = 3",
+        "answer": "13",
+        "steps": "12 + 1 = 13",
+        "distractors": [
+          "12",
+          "14",
+          "26"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "3.6 km → m",
+        "answer": "3600 m",
+        "steps": "3600 m",
+        "distractors": [
+          "3800 m",
+          "3400 m",
+          "360 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.12 = ? (%)",
+        "answer": "12%",
+        "steps": "12%",
+        "distractors": [
+          "17%",
+          "7%",
+          "24%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "7 × 8 − 10",
+        "answer": "46",
+        "steps": "56 − 10 = 46",
+        "distractors": [
+          "45",
+          "47",
+          "92"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve x + 8 = 20",
+        "answer": "x = 12",
+        "steps": "x = 12",
+        "distractors": [
+          "x=11",
+          "x=13",
+          "x=24"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 6x = 30",
+        "answer": "x = 5",
+        "steps": "x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "1800 mL → L",
+        "answer": "1.8 L",
+        "steps": "1.8 L",
+        "distractors": [
+          "2.05 L",
+          "1.55 L",
+          "3.6 L"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 4,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "9²",
+        "answer": "81",
+        "steps": "81",
+        "distractors": [
+          "80",
+          "82",
+          "162"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.35 = ? (%)",
+        "answer": "35%",
+        "steps": "35%",
+        "distractors": [
+          "40%",
+          "30%",
+          "70%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "8 × 9 − 12",
+        "answer": "60",
+        "steps": "72 − 12 = 60",
+        "distractors": [
+          "59",
+          "61",
+          "120"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "120 ÷ 10",
+        "answer": "12",
+        "steps": "12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√169",
+        "answer": "13",
+        "steps": "13",
+        "distractors": [
+          "12",
+          "14",
+          "26"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "6x + 9x",
+        "answer": "15x",
+        "steps": "15x",
+        "distractors": [
+          "14x",
+          "16x",
+          "18x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "14x − 8x",
+        "answer": "6x",
+        "steps": "6x",
+        "distractors": [
+          "5x",
+          "7x",
+          "9x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 3(x + 4)",
+        "answer": "3x + 12",
+        "steps": "3x + 12",
+        "distractors": [
+          "3x+14",
+          "4x+12",
+          "2x+12"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve x + 5 = 12",
+        "answer": "x = 7",
+        "steps": "x = 7",
+        "distractors": [
+          "x=6",
+          "x=8",
+          "x=14"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "2.75 km → m",
+        "answer": "2750 m",
+        "steps": "2750 m",
+        "distractors": [
+          "2950 m",
+          "2550 m",
+          "275 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.55 = ? (%)",
+        "answer": "55%",
+        "steps": "55%",
+        "distractors": [
+          "60%",
+          "50%",
+          "110%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "9 × 7 − 11",
+        "answer": "52",
+        "steps": "63 − 11 = 52",
+        "distractors": [
+          "51",
+          "53",
+          "104"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve 2x + 3 = 11",
+        "answer": "x = 4",
+        "steps": "2x = 8 | x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 3x − 2 = 10",
+        "answer": "x = 4",
+        "steps": "3x = 12 | x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "950 mL → L",
+        "answer": "0.95 L",
+        "steps": "0.95 L",
+        "distractors": [
+          "1.2 L",
+          "0.7 L",
+          "1.9 L"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 4,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "11²",
+        "answer": "121",
+        "steps": "121",
+        "distractors": [
+          "120",
+          "122",
+          "242"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.8 = ? (%)",
+        "answer": "80%",
+        "steps": "80%",
+        "distractors": [
+          "85%",
+          "75%",
+          "160%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "7 × 12 + 5",
+        "answer": "89",
+        "steps": "84 + 5 = 89",
+        "distractors": [
+          "88",
+          "90",
+          "178"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "144 ÷ 12",
+        "answer": "12",
+        "steps": "12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√196",
+        "answer": "14",
+        "steps": "14",
+        "distractors": [
+          "13",
+          "15",
+          "28"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "8x + 5x",
+        "answer": "13x",
+        "steps": "13x",
+        "distractors": [
+          "12x",
+          "14x",
+          "16x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "18x − 9x",
+        "answer": "9x",
+        "steps": "9x",
+        "distractors": [
+          "8x",
+          "10x",
+          "12x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 5(x + 2)",
+        "answer": "5x + 10",
+        "steps": "5x + 10",
+        "distractors": [
+          "5x+12",
+          "6x+10",
+          "4x+10"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve x − 6 = 9",
+        "answer": "x = 15",
+        "steps": "x = 15",
+        "distractors": [
+          "x=14",
+          "x=16",
+          "x=30"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "4.2 km → m",
+        "answer": "4200 m",
+        "steps": "4200 m",
+        "distractors": [
+          "4400 m",
+          "4000 m",
+          "420 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.07 = ? (%)",
+        "answer": "7%",
+        "steps": "7%",
+        "distractors": [
+          "9%",
+          "5%",
+          "14%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "6 × 11 − 7",
+        "answer": "59",
+        "steps": "66 − 7 = 59",
+        "distractors": [
+          "58",
+          "60",
+          "118"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve 3x + 4 = 16",
+        "answer": "x = 4",
+        "steps": "3x = 12 | x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 4x − 5 = 11",
+        "answer": "x = 4",
+        "steps": "4x = 16 | x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "300 g → kg",
+        "answer": "0.3 kg",
+        "steps": "0.3 kg",
+        "distractors": [
+          "0.4 kg",
+          "0.5 kg",
+          "3 kg"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 4,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "12²",
+        "answer": "144",
+        "steps": "144",
+        "distractors": [
+          "143",
+          "145",
+          "288"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.25 = ? (%)",
+        "answer": "25%",
+        "steps": "25%",
+        "distractors": [
+          "30%",
+          "20%",
+          "50%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "9 × 10 − 15",
+        "answer": "75",
+        "steps": "90 − 15 = 75",
+        "distractors": [
+          "74",
+          "76",
+          "150"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "180 ÷ 15",
+        "answer": "12",
+        "steps": "12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√225",
+        "answer": "15",
+        "steps": "15",
+        "distractors": [
+          "14",
+          "16",
+          "30"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "10x + 4x",
+        "answer": "14x",
+        "steps": "14x",
+        "distractors": [
+          "13x",
+          "15x",
+          "17x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "20x − 12x",
+        "answer": "8x",
+        "steps": "8x",
+        "distractors": [
+          "7x",
+          "9x",
+          "11x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 6(x + 1)",
+        "answer": "6x + 6",
+        "steps": "6x + 6",
+        "distractors": [
+          "6x+8",
+          "7x+6",
+          "5x+6"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve x + 9 = 18",
+        "answer": "x = 9",
+        "steps": "x = 9",
+        "distractors": [
+          "x=8",
+          "x=10",
+          "x=18"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "5.5 km → m",
+        "answer": "5500 m",
+        "steps": "5500 m",
+        "distractors": [
+          "5700 m",
+          "5300 m",
+          "550 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.15 = ? (%)",
+        "answer": "15%",
+        "steps": "15%",
+        "distractors": [
+          "20%",
+          "10%",
+          "30%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "8 × 11 − 6",
+        "answer": "82",
+        "steps": "88 − 6 = 82",
+        "distractors": [
+          "81",
+          "83",
+          "164"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve 5x + 2 = 17",
+        "answer": "x = 3",
+        "steps": "5x = 15 | x = 3",
+        "distractors": [
+          "x=2",
+          "x=4",
+          "x=6"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 2x − 3 = 7",
+        "answer": "x = 5",
+        "steps": "2x = 10 | x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "2.2 L → mL",
+        "answer": "2200 mL",
+        "steps": "1 L = 1000 mL | 2200 mL",
+        "distractors": [
+          "2400 mL",
+          "2000 mL",
+          "1100 mL"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 5,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "13²",
+        "answer": "169",
+        "steps": "169",
+        "distractors": [
+          "168",
+          "170",
+          "338"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.48 = ? (%)",
+        "answer": "48%",
+        "steps": "0.48 × 100% = 48%",
+        "distractors": [
+          "53%",
+          "43%",
+          "96%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "9 × 11 − 14",
+        "answer": "85",
+        "steps": "99 − 14 = 85",
+        "distractors": [
+          "84",
+          "86",
+          "170"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "156 ÷ 12",
+        "answer": "13",
+        "steps": "13",
+        "distractors": [
+          "12",
+          "14",
+          "26"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√256",
+        "answer": "16",
+        "steps": "16",
+        "distractors": [
+          "15",
+          "17",
+          "32"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "7x + 9x",
+        "answer": "16x",
+        "steps": "16x",
+        "distractors": [
+          "15x",
+          "17x",
+          "19x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "18x − 11x",
+        "answer": "7x",
+        "steps": "7x",
+        "distractors": [
+          "6x",
+          "8x",
+          "10x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 4(x + 6)",
+        "answer": "4x + 24",
+        "steps": "4x + 24",
+        "distractors": [
+          "4x+26",
+          "5x+24",
+          "3x+24"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve 2x + 5 = 17",
+        "answer": "x = 6",
+        "steps": "2x = 12 | x = 6",
+        "distractors": [
+          "x=5",
+          "x=7",
+          "x=12"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "3.25 km → m",
+        "answer": "3250 m",
+        "steps": "1 km = 1000 m | 3250 m",
+        "distractors": [
+          "3450 m",
+          "3050 m",
+          "325 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.125 = ? (%)",
+        "answer": "12.5%",
+        "steps": "12.5%",
+        "distractors": [
+          "17.5%",
+          "7.5%",
+          "25%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "8 × 12 − 9",
+        "answer": "87",
+        "steps": "96 − 9 = 87",
+        "distractors": [
+          "86",
+          "88",
+          "174"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve 3x + 7 = 19",
+        "answer": "x = 4",
+        "steps": "3x = 12 | x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 4x − 6 = 10",
+        "answer": "x = 4",
+        "steps": "4x = 16 | x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "850 mL → L",
+        "answer": "0.85 L",
+        "steps": "1 L = 1000 mL | 0.85 L",
+        "distractors": [
+          "1.1 L",
+          "0.6 L",
+          "1.7 L"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 5,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "14²",
+        "answer": "196",
+        "steps": "196",
+        "distractors": [
+          "195",
+          "197",
+          "392"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.32 = ? (%)",
+        "answer": "32%",
+        "steps": "32%",
+        "distractors": [
+          "37%",
+          "27%",
+          "64%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "7 × 13 + 8",
+        "answer": "99",
+        "steps": "91 + 8 = 99",
+        "distractors": [
+          "98",
+          "100",
+          "198"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "168 ÷ 14",
+        "answer": "12",
+        "steps": "12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√289",
+        "answer": "17",
+        "steps": "17",
+        "distractors": [
+          "16",
+          "18",
+          "34"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "9x + 8x",
+        "answer": "17x",
+        "steps": "17x",
+        "distractors": [
+          "16x",
+          "18x",
+          "20x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "20x − 7x",
+        "answer": "13x",
+        "steps": "13x",
+        "distractors": [
+          "12x",
+          "14x",
+          "16x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 5(x + 4)",
+        "answer": "5x + 20",
+        "steps": "5x + 20",
+        "distractors": [
+          "5x+22",
+          "6x+20",
+          "4x+20"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve 3x + 2 = 20",
+        "answer": "x = 6",
+        "steps": "3x = 18 | x = 6",
+        "distractors": [
+          "x=5",
+          "x=7",
+          "x=12"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "4.75 km → m",
+        "answer": "4750 m",
+        "steps": "4750 m",
+        "distractors": [
+          "4950 m",
+          "4550 m",
+          "475 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.06 = ? (%)",
+        "answer": "6%",
+        "steps": "6%",
+        "distractors": [
+          "8%",
+          "4%",
+          "12%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "6 × 14 − 5",
+        "answer": "79",
+        "steps": "84 − 5 = 79",
+        "distractors": [
+          "78",
+          "80",
+          "158"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve 5x + 3 = 28",
+        "answer": "x = 5",
+        "steps": "5x = 25 | x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 6x − 4 = 20",
+        "answer": "x = 4",
+        "steps": "6x = 24 | x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "420 g → kg",
+        "answer": "0.42 kg",
+        "steps": "0.42 kg",
+        "distractors": [
+          "0.52 kg",
+          "0.62 kg",
+          "4.2 kg"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 5,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "15²",
+        "answer": "225",
+        "steps": "225",
+        "distractors": [
+          "224",
+          "226",
+          "235"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.875 = ? (%)",
+        "answer": "87.5%",
+        "steps": "87.5%",
+        "distractors": [
+          "92.5%",
+          "82.5%",
+          "175%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "8 × 12 + 7",
+        "answer": "103",
+        "steps": "96 + 7 = 103",
+        "distractors": [
+          "102",
+          "104",
+          "206"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "200 ÷ 16",
+        "answer": "12.5",
+        "steps": "12.5",
+        "distractors": [
+          "12.6",
+          "12.4",
+          "125"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√324",
+        "answer": "18",
+        "steps": "18",
+        "distractors": [
+          "17",
+          "19",
+          "36"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "11x + 6x",
+        "answer": "17x",
+        "steps": "17x",
+        "distractors": [
+          "16x",
+          "18x",
+          "20x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "24x − 9x",
+        "answer": "15x",
+        "steps": "15x",
+        "distractors": [
+          "14x",
+          "16x",
+          "18x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 6(x + 3)",
+        "answer": "6x + 18",
+        "steps": "6x + 18",
+        "distractors": [
+          "6x+20",
+          "7x+18",
+          "5x+18"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve 4x + 8 = 24",
+        "answer": "x = 4",
+        "steps": "4x = 16 | x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "2.85 km → m",
+        "answer": "2850 m",
+        "steps": "2850 m",
+        "distractors": [
+          "3050 m",
+          "2650 m",
+          "285 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.205 = ? (%)",
+        "answer": "20.5%",
+        "steps": "20.5%",
+        "distractors": [
+          "25.5%",
+          "15.5%",
+          "41%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "9 × 12 − 10",
+        "answer": "98",
+        "steps": "108 − 10 = 98",
+        "distractors": [
+          "97",
+          "99",
+          "196"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve 7x + 1 = 36",
+        "answer": "x = 5",
+        "steps": "7x = 35 | x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 3x − 7 = 8",
+        "answer": "x = 5",
+        "steps": "3x = 15 | x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "1.6 L → mL",
+        "answer": "1600 mL",
+        "steps": "1 L = 1000 mL | 1600 mL",
+        "distractors": [
+          "1800 mL",
+          "1400 mL",
+          "800 mL"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 6,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "16²",
+        "answer": "256",
+        "steps": "256",
+        "distractors": [
+          "255",
+          "257",
+          "266"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.72 = ? (%)",
+        "answer": "72%",
+        "steps": "72%",
+        "distractors": [
+          "77%",
+          "67%",
+          "144%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "9 × 14 − 12",
+        "answer": "114",
+        "steps": "126 − 12 = 114",
+        "distractors": [
+          "113",
+          "115",
+          "228"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "180 ÷ 12",
+        "answer": "15",
+        "steps": "15",
+        "distractors": [
+          "14",
+          "16",
+          "30"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√361",
+        "answer": "19",
+        "steps": "19",
+        "distractors": [
+          "18",
+          "20",
+          "38"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "12x + 8x",
+        "answer": "20x",
+        "steps": "20x",
+        "distractors": [
+          "19x",
+          "21x",
+          "23x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "30x − 14x",
+        "answer": "16x",
+        "steps": "16x",
+        "distractors": [
+          "15x",
+          "17x",
+          "19x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 3(x + 7)",
+        "answer": "3x + 21",
+        "steps": "3x + 21",
+        "distractors": [
+          "3x+23",
+          "4x+21",
+          "2x+21"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve 2x + 6 = 18",
+        "answer": "x = 6",
+        "steps": "2x = 12 | x = 6",
+        "distractors": [
+          "x=5",
+          "x=7",
+          "x=12"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "A recipe uses sugar and flour in the ratio 2:1. If 60 grams of sugar are used, how much flour is needed?",
+        "answer": "30 g",
+        "steps": "60 ÷ 2 = 30 | Flour = 30 g",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.18 = ? (%)",
+        "answer": "18%",
+        "steps": "18%",
+        "distractors": [
+          "23%",
+          "13%",
+          "36%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "7 × 15 − 9",
+        "answer": "96",
+        "steps": "105 − 9 = 96",
+        "distractors": [
+          "95",
+          "97",
+          "192"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve 5x + 5 = 30",
+        "answer": "x = 5",
+        "steps": "5x = 25 | x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 4x − 8 = 12",
+        "answer": "x = 5",
+        "steps": "4x = 20 | x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "950 mL → L",
+        "answer": "0.95 L",
+        "steps": "0.95 L",
+        "distractors": [
+          "1.2 L",
+          "0.7 L",
+          "1.9 L"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 6,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "17²",
+        "answer": "289",
+        "steps": "289",
+        "distractors": [
+          "288",
+          "290",
+          "299"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.27 = ? (%)",
+        "answer": "27%",
+        "steps": "27%",
+        "distractors": [
+          "32%",
+          "22%",
+          "54%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "8 × 15 + 6",
+        "answer": "126",
+        "steps": "120 + 6 = 126",
+        "distractors": [
+          "125",
+          "127",
+          "252"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "192 ÷ 16",
+        "answer": "12",
+        "steps": "12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√400",
+        "answer": "20",
+        "steps": "20",
+        "distractors": [
+          "19",
+          "21",
+          "40"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "14x + 9x",
+        "answer": "23x",
+        "steps": "23x",
+        "distractors": [
+          "22x",
+          "24x",
+          "26x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "32x − 12x",
+        "answer": "20x",
+        "steps": "20x",
+        "distractors": [
+          "19x",
+          "21x",
+          "23x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 4(x + 5)",
+        "answer": "4x + 20",
+        "steps": "4x + 20",
+        "distractors": [
+          "4x+22",
+          "5x+20",
+          "3x+20"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve 3x + 9 = 24",
+        "answer": "x = 5",
+        "steps": "3x = 15 | x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "A drink mix uses juice and water in the ratio 3:2. If 10 cups of water are used, how much juice is needed?",
+        "answer": "15 cups",
+        "steps": "10 ÷ 2 = 5 | Juice = 15 cups",
+        "distractors": [
+          "13 cups",
+          "17 cups",
+          "30 cups"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.04 = ? (%)",
+        "answer": "4%",
+        "steps": "4%",
+        "distractors": [
+          "6%",
+          "2%",
+          "8%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "6 × 16 − 8",
+        "answer": "88",
+        "steps": "96 − 8 = 88",
+        "distractors": [
+          "87",
+          "89",
+          "176"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve 6x + 2 = 20",
+        "answer": "x = 3",
+        "steps": "6x = 18 | x = 3",
+        "distractors": [
+          "x=2",
+          "x=4",
+          "x=6"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 5x − 5 = 20",
+        "answer": "x = 5",
+        "steps": "5x = 25 | x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "0.75 L → mL",
+        "answer": "750 mL",
+        "steps": "750 mL",
+        "distractors": [
+          "950 mL",
+          "550 mL",
+          "375 mL"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 6,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "18²",
+        "answer": "324",
+        "steps": "324",
+        "distractors": [
+          "323",
+          "325",
+          "334"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.91 = ? (%)",
+        "answer": "91%",
+        "steps": "91%",
+        "distractors": [
+          "96%",
+          "86%",
+          "182%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "9 × 15 − 11",
+        "answer": "124",
+        "steps": "135 − 11 = 124",
+        "distractors": [
+          "123",
+          "125",
+          "248"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "210 ÷ 14",
+        "answer": "15",
+        "steps": "15",
+        "distractors": [
+          "14",
+          "16",
+          "30"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√441",
+        "answer": "21",
+        "steps": "21",
+        "distractors": [
+          "20",
+          "22",
+          "42"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "15x + 10x",
+        "answer": "25x",
+        "steps": "25x",
+        "distractors": [
+          "24x",
+          "26x",
+          "28x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "40x − 18x",
+        "answer": "22x",
+        "steps": "22x",
+        "distractors": [
+          "21x",
+          "23x",
+          "25x"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Expand 5(x + 6)",
+        "answer": "5x + 30",
+        "steps": "5x + 30",
+        "distractors": [
+          "5x+32",
+          "6x+30",
+          "4x+30"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve 4x + 4 = 28",
+        "answer": "x = 6",
+        "steps": "4x = 24 | x = 6",
+        "distractors": [
+          "x=5",
+          "x=7",
+          "x=12"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "A recipe uses flour and milk in the ratio 1:3. If 9 cups of milk are used, how much flour is needed?",
+        "answer": "3 cups",
+        "steps": "9 ÷ 3 = 3 | Flour = 3 cups",
+        "distractors": [
+          "1 cups",
+          "5 cups",
+          "6 cups"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.305 = ? (%)",
+        "answer": "30.5%",
+        "steps": "30.5%",
+        "distractors": [
+          "35.5%",
+          "25.5%",
+          "61%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "8 × 16 − 7",
+        "answer": "121",
+        "steps": "128 − 7 = 121",
+        "distractors": [
+          "120",
+          "122",
+          "242"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve 7x + 7 = 42",
+        "answer": "x = 5",
+        "steps": "7x = 35 | x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Solve 6x − 6 = 30",
+        "answer": "x = 6",
+        "steps": "6x = 36 | x = 6",
+        "distractors": [
+          "x=5",
+          "x=7",
+          "x=12"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "2.4 L → mL",
+        "answer": "2400 mL",
+        "steps": "2400 mL",
+        "distractors": [
+          "2600 mL",
+          "2200 mL",
+          "1200 mL"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 7,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "19²",
+        "answer": "361",
+        "steps": "19 × 19 = 361",
+        "distractors": [
+          "360",
+          "362",
+          "371"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Evaluate: −6 + 9 × 2",
+        "answer": "12",
+        "steps": "9 × 2 = 18 | −6 + 18 = 12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "0.44 = ? (%)",
+        "answer": "44%",
+        "steps": "0.44 × 100% = 44%",
+        "distractors": [
+          "49%",
+          "39%",
+          "88%"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "225 ÷ 15",
+        "answer": "15",
+        "steps": "225 ÷ 15 = 15",
+        "distractors": [
+          "14",
+          "16",
+          "30"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "16x + 9x",
+        "answer": "25x",
+        "steps": "16 + 9 = 25 | 16x + 9x = 25x",
+        "distractors": [
+          "24x",
+          "26x",
+          "28x"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "A recipe uses flour and milk in the ratio 1:4. If 12 cups of milk are used, how much flour is needed?",
+        "answer": "3 cups",
+        "steps": "Milk is 4 parts = 12 cups | 1 part = 12 ÷ 4 = 3 | Flour is 1 part | Flour = 3 cups",
+        "distractors": [
+          "1 cups",
+          "5 cups",
+          "6 cups"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Solve x + 12 = 25",
+        "answer": "x = 13",
+        "steps": "x + 12 = 25 | x = 25 − 12 | x = 13",
+        "distractors": [
+          "x=12",
+          "x=14",
+          "x=26"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "√484",
+        "answer": "22",
+        "steps": "22 × 22 = 484 | √484 = 22",
+        "distractors": [
+          "21",
+          "23",
+          "44"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: 7 − (−5)",
+        "answer": "12",
+        "steps": "Subtracting a negative means add | 7 + 5 = 12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "3.5 km → m",
+        "answer": "3500 m",
+        "steps": "1 km = 1000 m | 3.5 × 1000 = 3500 | 3.5 km = 3500 m",
+        "distractors": [
+          "3700 m",
+          "3300 m",
+          "350 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "9 × 16 − 13",
+        "answer": "131",
+        "steps": "9 × 16 = 144 | 144 − 13 = 131",
+        "distractors": [
+          "130",
+          "132",
+          "262"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve 5x = 45",
+        "answer": "x = 9",
+        "steps": "5x = 45 | x = 45 ÷ 5 | x = 9",
+        "distractors": [
+          "x=8",
+          "x=10",
+          "x=18"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "42x − 18x",
+        "answer": "24x",
+        "steps": "42 − 18 = 24 | 42x − 18x = 24x",
+        "distractors": [
+          "23x",
+          "25x",
+          "27x"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "0.66 = ? (%)",
+        "answer": "66%",
+        "steps": "0.66 × 100% = 66%",
+        "distractors": [
+          "71%",
+          "61%",
+          "132%"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "Evaluate: −12 ÷ 3 + 8",
+        "answer": "4",
+        "steps": "−12 ÷ 3 = −4 | −4 + 8 = 4",
+        "distractors": [
+          "3",
+          "5",
+          "8"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 7,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "20²",
+        "answer": "400",
+        "steps": "20 × 20 = 400",
+        "distractors": [
+          "399",
+          "401",
+          "410"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Evaluate: −8 + 6 × 3",
+        "answer": "10",
+        "steps": "6 × 3 = 18 | −8 + 18 = 10",
+        "distractors": [
+          "9",
+          "11",
+          "20"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "0.58 = ? (%)",
+        "answer": "58%",
+        "steps": "0.58 × 100% = 58%",
+        "distractors": [
+          "63%",
+          "53%",
+          "116%"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "240 ÷ 12",
+        "answer": "20",
+        "steps": "240 ÷ 12 = 20",
+        "distractors": [
+          "19",
+          "21",
+          "40"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "18x + 7x",
+        "answer": "25x",
+        "steps": "18 + 7 = 25 | 18x + 7x = 25x",
+        "distractors": [
+          "24x",
+          "26x",
+          "28x"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Solve x − 9 = 11",
+        "answer": "x = 20",
+        "steps": "x − 9 = 11 | x = 11 + 9 | x = 20",
+        "distractors": [
+          "x=19",
+          "x=21",
+          "x=40"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "√529",
+        "answer": "23",
+        "steps": "23 × 23 = 529 | √529 = 23",
+        "distractors": [
+          "22",
+          "24",
+          "46"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "A drink mix uses juice and water in the ratio 2:3. If 15 cups of water are used, how much juice is needed?",
+        "answer": "10 cups",
+        "steps": "Water is 3 parts = 15 cups | 1 part = 15 ÷ 3 = 5 | Juice is 2 parts | Juice = 2 × 5 = 10 cups",
+        "distractors": [
+          "8 cups",
+          "12 cups",
+          "20 cups"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: −10 − (−4)",
+        "answer": "−6",
+        "steps": "Subtracting a negative means add | −10 + 4 = −6",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "2.25 km → m",
+        "answer": "2250 m",
+        "steps": "1 km = 1000 m | 2.25 × 1000 = 2250 | 2.25 km = 2250 m",
+        "distractors": [
+          "2450 m",
+          "2050 m",
+          "225 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "6 × 17 − 8",
+        "answer": "94",
+        "steps": "6 × 17 = 102 | 102 − 8 = 94",
+        "distractors": [
+          "93",
+          "95",
+          "188"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve 6x = 48",
+        "answer": "x = 8",
+        "steps": "6x = 48 | x = 48 ÷ 6 | x = 8",
+        "distractors": [
+          "x=7",
+          "x=9",
+          "x=16"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "45x − 20x",
+        "answer": "25x",
+        "steps": "45 − 20 = 25 | 45x − 20x = 25x",
+        "distractors": [
+          "24x",
+          "26x",
+          "28x"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "0.09 = ? (%)",
+        "answer": "9%",
+        "steps": "0.09 × 100% = 9%",
+        "distractors": [
+          "11%",
+          "7%",
+          "18%"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "Evaluate: −3 × 7 + 5",
+        "answer": "−16",
+        "steps": "−3 × 7 = −21 | −21 + 5 = −16",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 7,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "21²",
+        "answer": "441",
+        "steps": "21 × 21 = 441",
+        "distractors": [
+          "440",
+          "442",
+          "451"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Evaluate: −4 × 5 + 12",
+        "answer": "−8",
+        "steps": "−4 × 5 = −20 | −20 + 12 = −8",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "0.73 = ? (%)",
+        "answer": "73%",
+        "steps": "0.73 × 100% = 73%",
+        "distractors": [
+          "78%",
+          "68%",
+          "146%"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "260 ÷ 13",
+        "answer": "20",
+        "steps": "260 ÷ 13 = 20",
+        "distractors": [
+          "19",
+          "21",
+          "40"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "20x + 6x",
+        "answer": "26x",
+        "steps": "20 + 6 = 26 | 20x + 6x = 26x",
+        "distractors": [
+          "25x",
+          "27x",
+          "29x"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Solve x + 15 = 30",
+        "answer": "x = 15",
+        "steps": "x + 15 = 30 | x = 30 − 15 | x = 15",
+        "distractors": [
+          "x=14",
+          "x=16",
+          "x=30"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "√576",
+        "answer": "24",
+        "steps": "24 × 24 = 576 | √576 = 24",
+        "distractors": [
+          "23",
+          "25",
+          "48"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "A recipe uses sugar and butter in the ratio 3:2. If 10 cups of butter are used, how much sugar is needed?",
+        "answer": "15 cups",
+        "steps": "Butter is 2 parts = 10 cups | 1 part = 10 ÷ 2 = 5 | Sugar is 3 parts | Sugar = 3 × 5 = 15 cups",
+        "distractors": [
+          "13 cups",
+          "17 cups",
+          "30 cups"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: 12 − (−7)",
+        "answer": "19",
+        "steps": "Subtracting a negative means add | 12 + 7 = 19",
+        "distractors": [
+          "18",
+          "20",
+          "38"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "4.8 km → m",
+        "answer": "4800 m",
+        "steps": "1 km = 1000 m | 4.8 × 1000 = 4800 | 4.8 km = 4800 m",
+        "distractors": [
+          "5000 m",
+          "4600 m",
+          "480 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "8 × 18 − 11",
+        "answer": "133",
+        "steps": "8 × 18 = 144 | 144 − 11 = 133",
+        "distractors": [
+          "132",
+          "134",
+          "266"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve 7x = 56",
+        "answer": "x = 8",
+        "steps": "7x = 56 | x = 56 ÷ 7 | x = 8",
+        "distractors": [
+          "x=7",
+          "x=9",
+          "x=16"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "50x − 21x",
+        "answer": "29x",
+        "steps": "50 − 21 = 29 | 50x − 21x = 29x",
+        "distractors": [
+          "28x",
+          "30x",
+          "32x"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "0.505 = ? (%)",
+        "answer": "50.5%",
+        "steps": "0.505 × 100% = 50.5%",
+        "distractors": [
+          "55.5%",
+          "45.5%",
+          "101%"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "Evaluate: −18 ÷ 6 + 9",
+        "answer": "6",
+        "steps": "−18 ÷ 6 = −3 | −3 + 9 = 6",
+        "distractors": [
+          "5",
+          "7",
+          "12"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 8,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "22²",
+        "answer": "484",
+        "steps": "484",
+        "distractors": [
+          "483",
+          "485",
+          "494"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.81 = ? (%)",
+        "answer": "81%",
+        "steps": "81%",
+        "distractors": [
+          "86%",
+          "76%",
+          "162%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Evaluate: 6 × (8 + 2)",
+        "answer": "60",
+        "steps": "6 × 10 = 60",
+        "distractors": [
+          "59",
+          "61",
+          "120"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "A number is divided by 5 and equals 12. What is the number?",
+        "answer": "60",
+        "steps": "12 × 5 = 60",
+        "distractors": [
+          "59",
+          "61",
+          "120"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√625",
+        "answer": "25",
+        "steps": "25",
+        "distractors": [
+          "24",
+          "26",
+          "50"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 4x + 7x − 2x",
+        "answer": "9x",
+        "steps": "9x",
+        "distractors": [
+          "8x",
+          "10x",
+          "12x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Expand and simplify: 3(x + 4)",
+        "answer": "3x + 12",
+        "steps": "3x + 12",
+        "distractors": [
+          "3x+14",
+          "4x+12",
+          "2x+12"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Evaluate: 2x + 5 when x = 6",
+        "answer": "17",
+        "steps": "12 + 5 = 17",
+        "distractors": [
+          "16",
+          "18",
+          "34"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: −4 + 3 × 7",
+        "answer": "17",
+        "steps": "21 − 4 = 17",
+        "distractors": [
+          "16",
+          "18",
+          "34"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "6.2 km → m",
+        "answer": "6200 m",
+        "steps": "6200 m",
+        "distractors": [
+          "6400 m",
+          "6000 m",
+          "620 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.14 = ? (%)",
+        "answer": "14%",
+        "steps": "14%",
+        "distractors": [
+          "19%",
+          "9%",
+          "28%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve: 2x + 3 = 11",
+        "answer": "4",
+        "steps": "2x = 8 → x = 4",
+        "distractors": [
+          "3",
+          "5",
+          "8"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 3x − 5 = 10",
+        "answer": "5",
+        "steps": "3x = 15 → x = 5",
+        "distractors": [
+          "4",
+          "6",
+          "10"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "A shirt costs $40. It is increased by 25%. What is the new price?",
+        "answer": "$50",
+        "steps": "25% of 40 = 10 | New price = $50",
+        "distractors": [
+          "$60",
+          "$40",
+          "$60"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "A drink mix uses juice and water in ratio 2:3. If 15 cups of water are used, how much juice is needed?",
+        "answer": "10 cups",
+        "steps": "15 ÷ 3 = 5 | Juice = 10 cups",
+        "distractors": [
+          "8 cups",
+          "12 cups",
+          "20 cups"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 8,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "23²",
+        "answer": "529",
+        "steps": "529",
+        "distractors": [
+          "528",
+          "530",
+          "539"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.67 = ? (%)",
+        "answer": "67%",
+        "steps": "67%",
+        "distractors": [
+          "72%",
+          "62%",
+          "134%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Evaluate: 9 × (6 − 2)",
+        "answer": "36",
+        "steps": "9 × 4 = 36",
+        "distractors": [
+          "35",
+          "37",
+          "72"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "A number increased by 8 equals 20. Find the number.",
+        "answer": "12",
+        "steps": "20 − 8 = 12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√676",
+        "answer": "26",
+        "steps": "26",
+        "distractors": [
+          "25",
+          "27",
+          "52"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 5x + 9x − 3x",
+        "answer": "11x",
+        "steps": "11x",
+        "distractors": [
+          "10x",
+          "12x",
+          "14x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Expand: 4(x + 3)",
+        "answer": "4x + 12",
+        "steps": "4x + 12",
+        "distractors": [
+          "4x+14",
+          "5x+12",
+          "3x+12"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Evaluate: 3x − 2 when x = 5",
+        "answer": "13",
+        "steps": "15 − 2 = 13",
+        "distractors": [
+          "12",
+          "14",
+          "26"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: −5 × 4 + 6",
+        "answer": "−14",
+        "steps": "−20 + 6 = −14",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "7.5 km → m",
+        "answer": "7500 m",
+        "steps": "7500 m",
+        "distractors": [
+          "7700 m",
+          "7300 m",
+          "750 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.025 = ? (%)",
+        "answer": "2.5%",
+        "steps": "2.5%",
+        "distractors": [
+          "4.5%",
+          "0.5%",
+          "5%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve: 4x + 6 = 22",
+        "answer": "4",
+        "steps": "4x = 16 → x = 4",
+        "distractors": [
+          "3",
+          "5",
+          "8"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 5x − 10 = 15",
+        "answer": "5",
+        "steps": "5x = 25 → x = 5",
+        "distractors": [
+          "4",
+          "6",
+          "10"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "A $80 jacket is discounted by 25%. What is the new price?",
+        "answer": "$60",
+        "steps": "25% of 80 = 20 | New price = $60",
+        "distractors": [
+          "$70",
+          "$50",
+          "$72"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "A recipe uses flour and milk in ratio 1:2. If 10 cups of milk are used, how much flour is needed?",
+        "answer": "5 cups",
+        "steps": "10 ÷ 2 = 5 | Flour = 5 cups",
+        "distractors": [
+          "3 cups",
+          "7 cups",
+          "10 cups"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 8,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "24²",
+        "answer": "576",
+        "steps": "576",
+        "distractors": [
+          "575",
+          "577",
+          "586"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.39 = ? (%)",
+        "answer": "39%",
+        "steps": "39%",
+        "distractors": [
+          "44%",
+          "34%",
+          "78%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Evaluate: 7 × (5 + 3)",
+        "answer": "56",
+        "steps": "7 × 8 = 56",
+        "distractors": [
+          "55",
+          "57",
+          "112"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "A number multiplied by 4 equals 28. Find the number.",
+        "answer": "7",
+        "steps": "28 ÷ 4 = 7",
+        "distractors": [
+          "6",
+          "8",
+          "14"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√729",
+        "answer": "27",
+        "steps": "27",
+        "distractors": [
+          "26",
+          "28",
+          "54"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 6x + 8x − 4x",
+        "answer": "10x",
+        "steps": "10x",
+        "distractors": [
+          "9x",
+          "11x",
+          "13x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Expand: 5(x + 2)",
+        "answer": "5x + 10",
+        "steps": "5x + 10",
+        "distractors": [
+          "5x+12",
+          "6x+10",
+          "4x+10"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Evaluate: 4x + 3 when x = 2",
+        "answer": "11",
+        "steps": "8 + 3 = 11",
+        "distractors": [
+          "10",
+          "12",
+          "22"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: −6 + 2 × 9",
+        "answer": "12",
+        "steps": "18 − 6 = 12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "9.1 km → m",
+        "answer": "9100 m",
+        "steps": "9100 m",
+        "distractors": [
+          "9300 m",
+          "8900 m",
+          "910 m"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "0.88 = ? (%)",
+        "answer": "88%",
+        "steps": "88%",
+        "distractors": [
+          "93%",
+          "83%",
+          "176%"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve: 6x + 3 = 21",
+        "answer": "3",
+        "steps": "6x = 18 → x = 3",
+        "distractors": [
+          "2",
+          "4",
+          "6"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 8x − 4 = 20",
+        "answer": "3",
+        "steps": "8x = 24 → x = 3",
+        "distractors": [
+          "2",
+          "4",
+          "6"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "A $120 bike is increased by 10%. What is the new price?",
+        "answer": "$132",
+        "steps": "10% of 120 = 12 | New price = $132",
+        "distractors": [
+          "$142",
+          "$122",
+          "$158.4"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "A recipe uses sugar and butter in ratio 4:1. If 5 cups of butter are used, how much sugar is needed?",
+        "answer": "20 cups",
+        "steps": "5 × 4 = 20 cups",
+        "distractors": [
+          "18 cups",
+          "22 cups",
+          "40 cups"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 9,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "In a right-angled triangle, the two shorter sides are 3 cm and 4 cm. Find the hypotenuse.",
+        "answer": "5 cm",
+        "steps": "3² + 4² = 9 + 16 = 25 | √25 = 5 cm",
+        "distractors": [
+          "15 cm",
+          "1 cm",
+          "10 cm"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.52 = ? (%)",
+        "answer": "52%",
+        "steps": "52%",
+        "distractors": [
+          "57%",
+          "47%",
+          "104%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Evaluate: 7 × (6 + 2)",
+        "answer": "56",
+        "steps": "56",
+        "distractors": [
+          "55",
+          "57",
+          "112"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "A number plus 9 equals 20. Find the number.",
+        "answer": "11",
+        "steps": "11",
+        "distractors": [
+          "10",
+          "12",
+          "22"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√144",
+        "answer": "12",
+        "steps": "12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 6x + 9x − 4x",
+        "answer": "11x",
+        "steps": "11x",
+        "distractors": [
+          "10x",
+          "12x",
+          "14x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Multiply: 2/3 × 5/4",
+        "answer": "5/6",
+        "steps": "(2×5)/(3×4) = 10/12 = 5/6",
+        "distractors": [
+          "6/6",
+          "5/7",
+          "4/6"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Evaluate: −4 × 6 + 5",
+        "answer": "−19",
+        "steps": "−19",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "2.8 km → m",
+        "answer": "2800 m",
+        "steps": "2800 m",
+        "distractors": [
+          "3000 m",
+          "2600 m",
+          "280 m"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Solve: 3x = 18",
+        "answer": "x = 6",
+        "steps": "x = 6",
+        "distractors": [
+          "x=5",
+          "x=7",
+          "x=12"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Divide: 3/5 ÷ 2/3",
+        "answer": "9/10",
+        "steps": "3/5 × 3/2 = 9/10",
+        "distractors": [
+          "10/10",
+          "9/11",
+          "8/10"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "In a right-angled triangle, sides are 5 cm and 12 cm. Find the hypotenuse.",
+        "answer": "13 cm",
+        "steps": "13 cm",
+        "distractors": [
+          "23 cm",
+          "3 cm",
+          "26 cm"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 2x + 6 = 16",
+        "answer": "x = 5",
+        "steps": "x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Evaluate: −15 ÷ 3 + 7",
+        "answer": "2",
+        "steps": "2",
+        "distractors": [
+          "1",
+          "3",
+          "4"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "900 mL → L",
+        "answer": "0.9 L",
+        "steps": "0.9 L",
+        "distractors": [
+          "1.15 L",
+          "0.65 L",
+          "1.8 L"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 9,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "In a right-angled triangle, hypotenuse = 13 cm, one side = 5 cm. Find the other side.",
+        "answer": "12 cm",
+        "steps": "12 cm",
+        "distractors": [
+          "22 cm",
+          "2 cm",
+          "24 cm"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.21 = ? (%)",
+        "answer": "21%",
+        "steps": "21%",
+        "distractors": [
+          "26%",
+          "16%",
+          "42%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Evaluate: 8 × (5 + 4)",
+        "answer": "72",
+        "steps": "72",
+        "distractors": [
+          "71",
+          "73",
+          "144"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "A number × 6 = 42. Find the number.",
+        "answer": "7",
+        "steps": "7",
+        "distractors": [
+          "6",
+          "8",
+          "14"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√196",
+        "answer": "14",
+        "steps": "14",
+        "distractors": [
+          "13",
+          "15",
+          "28"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 12x + 8x − 6x",
+        "answer": "14x",
+        "steps": "14x",
+        "distractors": [
+          "13x",
+          "15x",
+          "17x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Multiply: 4/5 × 3/2",
+        "answer": "6/5",
+        "steps": "12/10 = 6/5",
+        "distractors": [
+          "7/5",
+          "6/6",
+          "5/5"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Evaluate: −6 + 2 × 9",
+        "answer": "12",
+        "steps": "12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "3.6 km → m",
+        "answer": "3600 m",
+        "steps": "3600 m",
+        "distractors": [
+          "3800 m",
+          "3400 m",
+          "360 m"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Solve: 5x = 35",
+        "answer": "x = 7",
+        "steps": "x = 7",
+        "distractors": [
+          "x=6",
+          "x=8",
+          "x=14"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Divide: 7/8 ÷ 1/2",
+        "answer": "7/4",
+        "steps": "7/8 × 2/1 = 14/8 = 7/4",
+        "distractors": [
+          "8/4",
+          "7/5",
+          "6/4"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "In a right-angled triangle, sides are 9 cm and 12 cm. Find hypotenuse.",
+        "answer": "15 cm",
+        "steps": "15 cm",
+        "distractors": [
+          "25 cm",
+          "5 cm",
+          "30 cm"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 4x + 4 = 20",
+        "answer": "x = 4",
+        "steps": "x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Evaluate: −20 ÷ 5 + 6",
+        "answer": "2",
+        "steps": "2",
+        "distractors": [
+          "1",
+          "3",
+          "4"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "1.2 L → mL",
+        "answer": "1200 mL",
+        "steps": "1200 mL",
+        "distractors": [
+          "1400 mL",
+          "1000 mL",
+          "600 mL"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 9,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "In a right triangle, hypotenuse = 10 cm, one side = 6 cm. Find the other side.",
+        "answer": "8 cm",
+        "steps": "8 cm",
+        "distractors": [
+          "18 cm",
+          "1 cm",
+          "16 cm"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.75 = ? (%)",
+        "answer": "75%",
+        "steps": "75%",
+        "distractors": [
+          "80%",
+          "70%",
+          "150%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Evaluate: 9 × (7 − 3)",
+        "answer": "36",
+        "steps": "36",
+        "distractors": [
+          "35",
+          "37",
+          "72"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "A number − 7 = 15. Find the number.",
+        "answer": "22",
+        "steps": "22",
+        "distractors": [
+          "21",
+          "23",
+          "44"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√225",
+        "answer": "15",
+        "steps": "15",
+        "distractors": [
+          "14",
+          "16",
+          "30"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 15x + 10x − 5x",
+        "answer": "20x",
+        "steps": "20x",
+        "distractors": [
+          "19x",
+          "21x",
+          "23x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Multiply: 3/4 × 8/5",
+        "answer": "6/5",
+        "steps": "24/20 = 6/5",
+        "distractors": [
+          "7/5",
+          "6/6",
+          "5/5"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Evaluate: −7 × 3 + 8",
+        "answer": "−13",
+        "steps": "−13",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "1.5 km → m",
+        "answer": "1500 m",
+        "steps": "1500 m",
+        "distractors": [
+          "1700 m",
+          "1300 m",
+          "150 m"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Solve: 6x = 30",
+        "answer": "x = 5",
+        "steps": "x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Divide: 5/6 ÷ 2/3",
+        "answer": "5/4",
+        "steps": "5/6 × 3/2 = 15/12 = 5/4",
+        "distractors": [
+          "6/4",
+          "5/5",
+          "4/4"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "In a right triangle, sides are 8 cm and 15 cm. Find hypotenuse.",
+        "answer": "17 cm",
+        "steps": "17 cm",
+        "distractors": [
+          "27 cm",
+          "7 cm",
+          "34 cm"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 3x + 3 = 18",
+        "answer": "x = 5",
+        "steps": "x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Evaluate: −18 ÷ 3 + 4",
+        "answer": "−2",
+        "steps": "−2",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "750 mL → L",
+        "answer": "0.75 L",
+        "steps": "0.75 L",
+        "distractors": [
+          "1 L",
+          "0.5 L",
+          "1.5 L"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 10,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "A rectangle has a length of 8 cm and a width of 5 cm. Calculate the area of the rectangle.",
+        "answer": "40 cm²",
+        "steps": "Area = length × width | = 8 × 5 = 40 cm²",
+        "distractors": [
+          "50 cm²",
+          "30 cm²",
+          "80 cm²"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "A rectangle has a length of 8 cm and a width of 5 cm. Calculate the perimeter of the rectangle.",
+        "answer": "26 cm",
+        "steps": "Perimeter = 2(length + width) | = 2(8 + 5) = 2 × 13 = 26 cm",
+        "distractors": [
+          "36 cm",
+          "16 cm",
+          "52 cm"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In a right-angled triangle, the two shorter sides are 6 cm and 8 cm. Find the length of the hypotenuse.",
+        "answer": "10 cm",
+        "steps": "6² + 8² = 36 + 64 = 100 | √100 = 10 cm",
+        "distractors": [
+          "20 cm",
+          "1 cm",
+          "20 cm"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Evaluate: 7 × (4 + 6)",
+        "answer": "70",
+        "steps": "7 × 10 = 70",
+        "distractors": [
+          "69",
+          "71",
+          "140"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "0.6 = ? (%)",
+        "answer": "60%",
+        "steps": "60%",
+        "distractors": [
+          "65%",
+          "55%",
+          "120%"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 5x + 5x − 3x",
+        "answer": "7x",
+        "steps": "7x",
+        "distractors": [
+          "6x",
+          "8x",
+          "10x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Multiply: 2/3 × 9/4",
+        "answer": "3/2",
+        "steps": "18/12 = 3/2",
+        "distractors": [
+          "4/2",
+          "3/3",
+          "2/2"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve: 2x + 8 = 18",
+        "answer": "5",
+        "steps": "2x = 10 → x = 5",
+        "distractors": [
+          "4",
+          "6",
+          "10"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: −9 + 3 × 5",
+        "answer": "6",
+        "steps": "15 − 9 = 6",
+        "distractors": [
+          "5",
+          "7",
+          "12"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "A square has a side length of 6 cm. Calculate its area.",
+        "answer": "36 cm²",
+        "steps": "Area = 6 × 6 = 36 cm²",
+        "distractors": [
+          "46 cm²",
+          "26 cm²",
+          "72 cm²"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Divide: 4/5 ÷ 2/3",
+        "answer": "6/5",
+        "steps": "4/5 × 3/2 = 12/10 = 6/5",
+        "distractors": [
+          "7/5",
+          "6/6",
+          "5/5"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the square root of 25.",
+        "answer": "5",
+        "steps": "5",
+        "distractors": [
+          "4",
+          "6",
+          "10"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 3x = 12",
+        "answer": "x = 4",
+        "steps": "x = 4",
+        "distractors": [
+          "x=3",
+          "x=5",
+          "x=8"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Convert 750 g to kilograms.",
+        "answer": "0.75 kg",
+        "steps": "1 kg = 1000 g | 750 ÷ 1000 = 0.75 kg",
+        "distractors": [
+          "0.85 kg",
+          "0.95 kg",
+          "7.5 kg"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "A recipe uses sugar and butter in the ratio 3:2. If 10 cups of butter are used, how much sugar is needed?",
+        "answer": "15 cups",
+        "steps": "10 ÷ 2 = 5 | Sugar = 15 cups",
+        "distractors": [
+          "13 cups",
+          "17 cups",
+          "30 cups"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 10,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "A rectangle has a length of 10 cm and a width of 7 cm. Calculate the area of the rectangle.",
+        "answer": "70 cm²",
+        "steps": "10 × 7 = 70 cm²",
+        "distractors": [
+          "80 cm²",
+          "60 cm²",
+          "140 cm²"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "A rectangle has a length of 10 cm and a width of 7 cm. Calculate the perimeter of the rectangle.",
+        "answer": "34 cm",
+        "steps": "2(10 + 7) = 34 cm",
+        "distractors": [
+          "44 cm",
+          "24 cm",
+          "68 cm"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In a right-angled triangle, the two shorter sides are 5 cm and 12 cm. Find the hypotenuse.",
+        "answer": "13 cm",
+        "steps": "25 + 144 = 169 | √169 = 13 cm",
+        "distractors": [
+          "23 cm",
+          "3 cm",
+          "26 cm"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Evaluate: 6 × (9 − 4)",
+        "answer": "30",
+        "steps": "6 × 5 = 30",
+        "distractors": [
+          "29",
+          "31",
+          "60"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "0.25 = ? (%)",
+        "answer": "25%",
+        "steps": "25%",
+        "distractors": [
+          "30%",
+          "20%",
+          "50%"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 8x + 4x − 2x",
+        "answer": "10x",
+        "steps": "10x",
+        "distractors": [
+          "9x",
+          "11x",
+          "13x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Add: 2/5 + 3/5",
+        "answer": "1",
+        "steps": "5/5 = 1",
+        "distractors": [
+          "0",
+          "2",
+          "2"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve: 3x + 6 = 21",
+        "answer": "5",
+        "steps": "3x = 15 → x = 5",
+        "distractors": [
+          "4",
+          "6",
+          "10"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: −8 × 4 + 10",
+        "answer": "−22",
+        "steps": "−32 + 10 = −22",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "A square has a side length of 9 cm. Calculate its area.",
+        "answer": "81 cm²",
+        "steps": "81 cm²",
+        "distractors": [
+          "91 cm²",
+          "71 cm²",
+          "162 cm²"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Subtract: 7/8 − 3/8",
+        "answer": "1/2",
+        "steps": "4/8 = 1/2",
+        "distractors": [
+          "2/2",
+          "1/3",
+          "1/2"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the square root of 100.",
+        "answer": "10",
+        "steps": "10",
+        "distractors": [
+          "9",
+          "11",
+          "20"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 4x = 20",
+        "answer": "x = 5",
+        "steps": "x = 5",
+        "distractors": [
+          "x=4",
+          "x=6",
+          "x=10"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Convert 1.5 litres to millilitres.",
+        "answer": "1500 mL",
+        "steps": "1500 mL",
+        "distractors": [
+          "1700 mL",
+          "1300 mL",
+          "750 mL"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "A recipe uses flour and milk in the ratio 2:3. If 15 cups of milk are used, how much flour is needed?",
+        "answer": "10 cups",
+        "steps": "10 cups",
+        "distractors": [
+          "8 cups",
+          "12 cups",
+          "20 cups"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 10,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "A rectangle has a length of 12 cm and a width of 4 cm. Calculate the area of the rectangle.",
+        "answer": "48 cm²",
+        "steps": "12 × 4 = 48 cm²",
+        "distractors": [
+          "58 cm²",
+          "38 cm²",
+          "96 cm²"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "A rectangle has a length of 12 cm and a width of 4 cm. Calculate the perimeter of the rectangle.",
+        "answer": "32 cm",
+        "steps": "2(12 + 4) = 32 cm",
+        "distractors": [
+          "42 cm",
+          "22 cm",
+          "64 cm"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In a right-angled triangle, the two shorter sides are 9 cm and 12 cm. Find the hypotenuse.",
+        "answer": "15 cm",
+        "steps": "81 + 144 = 225 | √225 = 15 cm",
+        "distractors": [
+          "25 cm",
+          "5 cm",
+          "30 cm"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Evaluate: 8 × (6 + 3)",
+        "answer": "72",
+        "steps": "8 × 9 = 72",
+        "distractors": [
+          "71",
+          "73",
+          "144"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "0.4 = ? (%)",
+        "answer": "40%",
+        "steps": "40%",
+        "distractors": [
+          "45%",
+          "35%",
+          "80%"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 9x + 6x − 5x",
+        "answer": "10x",
+        "steps": "10x",
+        "distractors": [
+          "9x",
+          "11x",
+          "13x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Add: 2/3 + 1/4",
+        "answer": "11/12",
+        "steps": "LCM = 12 | 2/3 = 8/12 | 1/4 = 3/12 | Total = 11/12",
+        "distractors": [
+          "12/12",
+          "11/13",
+          "10/12"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve: 5x + 5 = 30",
+        "answer": "5",
+        "steps": "5x = 25 → x = 5",
+        "distractors": [
+          "4",
+          "6",
+          "10"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: −8 × 7",
+        "answer": "−56",
+        "steps": "−56",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "A square has a side length of 11 cm. Calculate its area.",
+        "answer": "121 cm²",
+        "steps": "121 cm²",
+        "distractors": [
+          "131 cm²",
+          "111 cm²",
+          "242 cm²"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Subtract: 5/6 − 1/4",
+        "answer": "7/12",
+        "steps": "LCM = 12 | 5/6 = 10/12 | 1/4 = 3/12 | Answer = 7/12",
+        "distractors": [
+          "8/12",
+          "7/13",
+          "6/12"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the square root of 169.",
+        "answer": "13",
+        "steps": "13",
+        "distractors": [
+          "12",
+          "14",
+          "26"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 6x = 36",
+        "answer": "x = 6",
+        "steps": "x = 6",
+        "distractors": [
+          "x=5",
+          "x=7",
+          "x=12"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Convert 900 millilitres to litres.",
+        "answer": "0.9 L",
+        "steps": "900 ÷ 1000 = 0.9 L",
+        "distractors": [
+          "1.15 L",
+          "0.65 L",
+          "1.8 L"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "A recipe uses juice and water in the ratio 1:2. If 8 cups of water are used, how much juice is needed?",
+        "answer": "4 cups",
+        "steps": "8 ÷ 2 = 4 cups",
+        "distractors": [
+          "2 cups",
+          "6 cups",
+          "8 cups"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 11,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "25²",
+        "answer": "625",
+        "steps": "625",
+        "distractors": [
+          "624",
+          "626",
+          "635"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.37 = ? (%)",
+        "answer": "37%",
+        "steps": "37%",
+        "distractors": [
+          "42%",
+          "32%",
+          "74%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Evaluate: 9 × (7 + 2)",
+        "answer": "81",
+        "steps": "9 × 9 = 81",
+        "distractors": [
+          "80",
+          "82",
+          "162"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "A number divided by 4 equals 6. Find the number.",
+        "answer": "24",
+        "steps": "6 × 4 = 24",
+        "distractors": [
+          "23",
+          "25",
+          "48"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√784",
+        "answer": "28",
+        "steps": "28",
+        "distractors": [
+          "27",
+          "29",
+          "56"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 20x + 15x − 10x",
+        "answer": "25x",
+        "steps": "25x",
+        "distractors": [
+          "24x",
+          "26x",
+          "28x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Multiply: 3/5 × 10/9",
+        "answer": "2/3",
+        "steps": "30/45 = 2/3",
+        "distractors": [
+          "3/3",
+          "2/4",
+          "1/3"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve: 5x + 5 = 30",
+        "answer": "5",
+        "steps": "5x = 25 → x = 5",
+        "distractors": [
+          "4",
+          "6",
+          "10"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: −7 × 6 + 10",
+        "answer": "−32",
+        "steps": "−42 + 10 = −32",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "A square has a side length of 12 cm. Calculate its area.",
+        "answer": "144 cm²",
+        "steps": "12 × 12 = 144 cm²",
+        "distractors": [
+          "154 cm²",
+          "134 cm²",
+          "288 cm²"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Divide: 8/9 ÷ 4/3",
+        "answer": "2/3",
+        "steps": "8/9 × 3/4 = 24/36 = 2/3",
+        "distractors": [
+          "3/3",
+          "2/4",
+          "1/3"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the square root of 100.",
+        "answer": "10",
+        "steps": "10",
+        "distractors": [
+          "9",
+          "11",
+          "20"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 4x = 32",
+        "answer": "x = 8",
+        "steps": "x = 8",
+        "distractors": [
+          "x=7",
+          "x=9",
+          "x=16"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Convert 1.25 litres to millilitres.",
+        "answer": "1250 mL",
+        "steps": "1.25 × 1000 = 1250 mL",
+        "distractors": [
+          "1450 mL",
+          "1050 mL",
+          "625 mL"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "A recipe uses flour and sugar in the ratio 2:3. If 15 cups of sugar are used, how much flour is needed?",
+        "answer": "10 cups",
+        "steps": "15 ÷ 3 = 5 | Flour = 10 cups",
+        "distractors": [
+          "8 cups",
+          "12 cups",
+          "20 cups"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 11,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "18²",
+        "answer": "324",
+        "steps": "324",
+        "distractors": [
+          "323",
+          "325",
+          "334"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.625 = ? (%)",
+        "answer": "62.5%",
+        "steps": "62.5%",
+        "distractors": [
+          "67.5%",
+          "57.5%",
+          "125%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Evaluate: 8 × (10 − 3)",
+        "answer": "56",
+        "steps": "8 × 7 = 56",
+        "distractors": [
+          "55",
+          "57",
+          "112"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "A number increased by 12 equals 25. Find the number.",
+        "answer": "13",
+        "steps": "25 − 12 = 13",
+        "distractors": [
+          "12",
+          "14",
+          "26"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√361",
+        "answer": "19",
+        "steps": "19",
+        "distractors": [
+          "18",
+          "20",
+          "38"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 12x + 9x − 5x",
+        "answer": "16x",
+        "steps": "16x",
+        "distractors": [
+          "15x",
+          "17x",
+          "19x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Add: 2/3 + 3/5",
+        "answer": "19/15",
+        "steps": "LCM = 15 | 2/3 = 10/15 | 3/5 = 9/15 | Total = 19/15",
+        "distractors": [
+          "20/15",
+          "19/16",
+          "18/15"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve: 3x + 4 = 19",
+        "answer": "5",
+        "steps": "3x = 15 → x = 5",
+        "distractors": [
+          "4",
+          "6",
+          "10"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: −6 × 7 + 8",
+        "answer": "−34",
+        "steps": "−42 + 8 = −34",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "A rectangle has a length of 9 cm and width of 4 cm. Calculate the area.",
+        "answer": "36 cm²",
+        "steps": "9 × 4 = 36 cm²",
+        "distractors": [
+          "46 cm²",
+          "26 cm²",
+          "72 cm²"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Subtract: 7/8 − 1/3",
+        "answer": "13/24",
+        "steps": "LCM = 24 | 7/8 = 21/24 | 1/3 = 8/24 | Answer = 13/24",
+        "distractors": [
+          "14/24",
+          "13/25",
+          "12/24"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the square root of 225.",
+        "answer": "15",
+        "steps": "15",
+        "distractors": [
+          "14",
+          "16",
+          "30"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 6x = 54",
+        "answer": "x = 9",
+        "steps": "x = 9",
+        "distractors": [
+          "x=8",
+          "x=10",
+          "x=18"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Convert 2.4 km to metres.",
+        "answer": "2400 m",
+        "steps": "2.4 × 1000 = 2400 m",
+        "distractors": [
+          "2600 m",
+          "2200 m",
+          "240 m"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "A bike costs $120. Its price is increased by 15%. What is the new price?",
+        "answer": "$138",
+        "steps": "15% of 120 = 18 | New price = 120 + 18 = $138",
+        "distractors": [
+          "$148",
+          "$128",
+          "$165.6"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 11,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "17²",
+        "answer": "289",
+        "steps": "289",
+        "distractors": [
+          "288",
+          "290",
+          "299"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "0.48 = ? (%)",
+        "answer": "48%",
+        "steps": "48%",
+        "distractors": [
+          "53%",
+          "43%",
+          "96%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Evaluate: 6 × (5 + 7)",
+        "answer": "72",
+        "steps": "6 × 12 = 72",
+        "distractors": [
+          "71",
+          "73",
+          "144"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "A number multiplied by 5 equals 45. Find the number.",
+        "answer": "9",
+        "steps": "45 ÷ 5 = 9",
+        "distractors": [
+          "8",
+          "10",
+          "18"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "√441",
+        "answer": "21",
+        "steps": "21",
+        "distractors": [
+          "20",
+          "22",
+          "42"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Simplify: 18x + 6x − 8x",
+        "answer": "16x",
+        "steps": "16x",
+        "distractors": [
+          "15x",
+          "17x",
+          "19x"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Add: 5/6 + 1/4",
+        "answer": "13/12",
+        "steps": "LCM = 12 | 5/6 = 10/12 | 1/4 = 3/12 | Total = 13/12",
+        "distractors": [
+          "14/12",
+          "13/13",
+          "12/12"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve: 4x + 3 = 19",
+        "answer": "4",
+        "steps": "4x = 16 → x = 4",
+        "distractors": [
+          "3",
+          "5",
+          "8"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Evaluate: −9 × 5 + 6",
+        "answer": "−39",
+        "steps": "−45 + 6 = −39",
+        "distractors": [
+          "Option A",
+          "Option B",
+          "Option C"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "A square has a side length of 15 cm. Calculate the area.",
+        "answer": "225 cm²",
+        "steps": "15 × 15 = 225 cm²",
+        "distractors": [
+          "235 cm²",
+          "215 cm²",
+          "450 cm²"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Divide: 7/10 ÷ 2/5",
+        "answer": "7/4",
+        "steps": "7/10 × 5/2 = 35/20 = 7/4",
+        "distractors": [
+          "8/4",
+          "7/5",
+          "6/4"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the square root of 144.",
+        "answer": "12",
+        "steps": "12",
+        "distractors": [
+          "11",
+          "13",
+          "24"
+        ]
+      },
+      {
+        "id": 13,
+        "q": "Solve: 8x = 64",
+        "answer": "x = 8",
+        "steps": "x = 8",
+        "distractors": [
+          "x=7",
+          "x=9",
+          "x=16"
+        ]
+      },
+      {
+        "id": 14,
+        "q": "Convert 750 millilitres to litres.",
+        "answer": "0.75 L",
+        "steps": "750 ÷ 1000 = 0.75 L",
+        "distractors": [
+          "1 L",
+          "0.5 L",
+          "1.5 L"
+        ]
+      },
+      {
+        "id": 15,
+        "q": "A jacket costs $80. It is discounted by 25%. What is the new price?",
+        "answer": "$60",
+        "steps": "25% of 80 = 20 | New price = 80 − 20 = $60",
+        "distractors": [
+          "$70",
+          "$50",
+          "$72"
+        ]
+      }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// SET SELECTION
+// ═══════════════════════════════════════════════════════════
+let selectedWeek = 1;
+let selectedSet  = 1;
+
+function updateSetOptions() {
+  const week = parseInt(document.getElementById('weekSelect').value);
+  const setSelect = document.getElementById('setSelect');
+  // Week 1 only has sets 1,2,3 but set 1 is always available
+  // All weeks have sets 1,2,3
+  setSelect.innerHTML = '';
+  const maxSet = 3;
+  const minSet = (week === 1) ? 1 : 1;
+  for(let s = minSet; s <= maxSet; s++) {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = `Set ${s}`;
+    setSelect.appendChild(opt);
+  }
+  updateSelectedSet();
+}
+
+function updateSelectedSet() {
+  selectedWeek = parseInt(document.getElementById('weekSelect').value);
+  selectedSet  = parseInt(document.getElementById('setSelect').value);
+  const label = `Week ${selectedWeek} · Set ${selectedSet}`;
+  document.getElementById('selectedSetLabel').textContent = label;
+  document.getElementById('homeSubtitle').textContent = `Week ${selectedWeek} Lesson ${selectedSet}, Term 2, 2026`;
+}
+
+function getActiveQuestions() {
+  // Week 1 Set 1 = the hardcoded ALL_QUESTIONS
+  if(selectedWeek === 1 && selectedSet === 1) return ALL_QUESTIONS;
+  // Otherwise find in ALL_SETS
+  const found = ALL_SETS.find(s => s.week === selectedWeek && s.set === selectedSet);
+  if(!found) return ALL_QUESTIONS;
+  // Map to same format as ALL_QUESTIONS
+  return found.questions.map((q, i) => ({
+    id: i+1,
+    q: q.q,
+    answer: q.answer,
+    steps: q.steps,
+    distractors: q.distractors
+  }));
+}
+
+// Initialise on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateSetOptions();
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let currentMode = '';
+let currentDiff = 'easy';
+let timerEnabled = true;
+let score = 0;
+let combo = 0;
+let qIndex = 0;
+let qList  = [];
+let timer  = null;
+let timerTick = null;
+let timeLeft = 0;
+let totalTime = 0;
+let correctCount = 0;
+let wrongCount   = 0;
+let chainStreak  = 0;
+let bestStreak   = 0;
+let matchSelected = null;
+let matchMatched  = 0;
+const TOTAL_Q = 15;
+const Q_TIME_BLITZ = 40;
+const Q_TIME_FILL  = 50;
+
+// ═══════════════════════════════════════════════════════════
+// TEACHER TIMER TOGGLE
+// ═══════════════════════════════════════════════════════════
+function toggleTimer() {
+  timerEnabled = !timerEnabled;
+  const btn = document.getElementById('timerToggleBtn');
+  if(timerEnabled){
+    btn.textContent='⏱ Timer: ON';
+    btn.style.background='rgba(0,212,170,0.15)';
+    btn.style.borderColor='var(--teal)';
+    btn.style.color='var(--teal)';
+  } else {
+    btn.textContent='⏱ Timer: OFF';
+    btn.style.background='rgba(248,113,113,0.15)';
+    btn.style.borderColor='var(--red)';
+    btn.style.color='var(--red)';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════════════════════════
+function initParticles() {
+  const wrap = document.getElementById('particles');
+  wrap.innerHTML = '';
+  const colours = ['#00d4aa','#ff6b9d','#ffd93d','#a855f7','#38bdf8','#fb923c','#4ade80'];
+  for(let i=0;i<22;i++){
+    const el = document.createElement('div');
+    el.className = 'particle';
+    const sz = 4 + Math.random()*10;
+    el.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:-${sz}px;background:${colours[Math.floor(Math.random()*colours.length)]};animation-duration:${8+Math.random()*14}s;animation-delay:${-Math.random()*14}s;`;
+    wrap.appendChild(el);
+  }
+}
+initParticles();
+
+// ═══════════════════════════════════════════════════════════
+// SCREEN NAV
+// ═══════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const backBtn = document.getElementById('backBtn');
+  backBtn.classList.toggle('visible', id!=='home' && id!=='results');
+}
+
+function goHome() {
+  clearInterval(timer);
+  clearInterval(timerTick);
+  showScreen('home');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODE LAUNCH — no difficulty screen, straight into game
+// ═══════════════════════════════════════════════════════════
+function launchDirect(mode) {
+  currentMode = mode;
+  currentDiff = 'easy';
+  if(mode==='blitz') startBlitz();
+  else if(mode==='match') startMatch();
+  else if(mode==='fill')  startFill();
+  else if(mode==='chain') startChain();
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILITY
+// ═══════════════════════════════════════════════════════════
+function shuffle(a) {
+  const b=[...a];
+  for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
+  return b;
+}
+
+function pick(n, arr) { return shuffle(arr).slice(0,n); }
+
+function spawnPoints(pts, color='#ffd93d') {
+  const el = document.createElement('div');
+  el.className='points-pop';
+  el.style.cssText=`color:${color};top:${window.innerHeight/2-60}px;left:${window.innerWidth/2-20}px`;
+  el.textContent=(pts>0?'+':'')+pts+' pts';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1300);
+}
+
+function updateCombo(n) {
+  combo = n;
+  const badge = document.getElementById('comboBadge');
+  if(combo>=2){
+    document.getElementById('comboCount').textContent=combo;
+    badge.classList.add('show');
+    setTimeout(()=>badge.classList.remove('show'),1600);
+  }
+}
+
+function buildDots(n, active) {
+  const wrap = document.getElementById('progressDots');
+  wrap.innerHTML='';
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i===active?' current':'');
+    d.id=`dot-${i}`;
+    wrap.appendChild(d);
+  }
+}
+
+function markDot(i, correct) {
+  const d=document.getElementById(`dot-${i}`);
+  if(d) d.className='dot '+(correct?'done-correct':'done-wrong');
+}
+
+function nextDot(i) {
+  const d=document.getElementById(`dot-${i}`);
+  if(d) d.className='dot current';
+}
+
+function applyTimerUI() {
+  const wrap = document.getElementById('timerBarWrap');
+  const pill = document.getElementById('timerSecsPill');
+  if(wrap) wrap.style.display = timerEnabled ? 'flex' : 'none';
+  if(pill) pill.style.display = timerEnabled ? 'flex' : 'none';
+}
+
+function startTimerBar(secs, barId, cb) {
+  clearInterval(timer);
+  clearInterval(timerTick);
+  timeLeft = secs;
+  totalTime = secs;
+  const bar   = document.getElementById(barId);
+  const secEl = document.getElementById('timerSecs');
+
+  if(!timerEnabled) {
+    if(bar)   { bar.style.width='100%'; bar.className='timer-bar'; }
+    if(secEl) secEl.textContent='–';
+    return;
+  }
+
+  const update = () => {
+    const pct = (timeLeft / totalTime) * 100;
+    if(bar)   { bar.style.width=pct+'%'; bar.className='timer-bar'+(pct<33?' danger':pct<60?' warn':''); }
+    if(secEl) secEl.textContent = timeLeft;
+    if(timeLeft<=0){ clearInterval(timer); cb(); return; }
+    timeLeft--;
+  };
+  update();
+  timer = setInterval(update, 1000);
+}
+
+// Appends step-by-step panel below feedback, and reveals the in-card Next button
+function showStepsPanel(steps, answer) {
+  const wrap = document.getElementById('qWrapper');
+  const old = document.getElementById('stepsPanel');
+  if(old) old.remove();
+
+  const panel = document.createElement('div');
+  panel.id = 'stepsPanel';
+  panel.style.cssText='margin-top:14px;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.35);border-radius:14px;padding:16px 20px;text-align:left;width:100%;';
+  panel.innerHTML=`
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:10px;">📋 Step-by-Step Answer</div>
+    <div style="font-size:15px;color:var(--text);font-family:'Nunito',sans-serif;font-weight:700;line-height:1.8;">${steps}</div>
+    <div style="margin-top:10px;font-family:'Fredoka One',cursive;font-size:18px;color:var(--yellow);">✅ Answer: ${answer}</div>
+  `;
+  wrap.appendChild(panel);
+
+  // Reveal the Next button that's already sitting inside the question card
+  const nextBtn = document.getElementById('nextBtn');
+  if(nextBtn) nextBtn.style.display = 'inline-block';
+}
+
+// ═══════════════════════════════════════════════════════════
+// NEXT BUTTON HANDLER — blitz & fill
+// ═══════════════════════════════════════════════════════════
+let pendingAdvance = null;
+
+function advanceQuestion() {
+  qIndex++;
+  if(qIndex < TOTAL_Q) {
+    if(pendingAdvance==='blitz') renderBlitzQ();
+    else renderFillQ();
+  } else {
+    showResults(pendingAdvance);
+  }
+}
+
+// ── Right arrow key → Next Question (works in all modes) ──
+document.addEventListener('keydown', function(e) {
+  if(e.key !== 'ArrowRight') return;
+
+  // Blitz or Fill: only if the Next button is visible
+  const nextBtn = document.getElementById('nextBtn');
+  if(nextBtn && nextBtn.style.display !== 'none') {
+    advanceQuestion();
+    return;
+  }
+
+  // Chain mode: only if chainNextBtn is visible
+  const chainNextBtn = document.getElementById('chainNextBtn');
+  if(chainNextBtn && chainNextBtn.style.display !== 'none') {
+    chainNextBtn.click();
+    return;
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// BLITZ MODE — MCQ, manual Next
+// ═══════════════════════════════════════════════════════════
+function startBlitz() {
+  score=0; combo=0; qIndex=0; correctCount=0; wrongCount=0;
+  pendingAdvance='blitz';
+  qList = getActiveQuestions();
+  document.getElementById('scoreVal').textContent=0;
+  buildDots(TOTAL_Q,0);
+  applyTimerUI();
+  showScreen('game');
+  renderBlitzQ();
+}
+
+function renderBlitzQ() {
+  const q = qList[qIndex];
+  document.getElementById('qNumVal').textContent = qIndex+1;
+  document.getElementById('scoreVal').textContent = score;
+  startTimerBar(Q_TIME_BLITZ, 'timerBar', ()=>blitzAnswer(null));
+
+  const opts = shuffle([q.answer, ...q.distractors]);
+  const wrap = document.getElementById('qWrapper');
+  wrap.innerHTML=`
+    <div class="question-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:0;">
+          <div class="q-type-label">Question ${qIndex+1} of ${TOTAL_Q}</div>
+          <div class="q-prompt" style="font-size:clamp(16px,3vw,24px);line-height:1.4">${q.q}</div>
+          <div class="q-instruction" style="margin-top:12px">Select the correct answer:</div>
+        </div>
+        <button id="nextBtn" onclick="advanceQuestion()" style="display:none;flex-shrink:0;background:linear-gradient(135deg,var(--teal),var(--purple));border:none;border-radius:12px;padding:12px 22px;font-family:'Fredoka One',cursive;font-size:18px;color:#fff;cursor:pointer;box-shadow:0 4px 18px rgba(0,212,170,0.4);white-space:nowrap;">
+          Next →
+        </button>
+      </div>
+    </div>
+    <div class="options-grid" id="optsGrid">
+      ${opts.map(o=>`<button class="opt-btn" onclick="blitzAnswer(this,'${o.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><span style="font-size:clamp(13px,2.5vw,21px)">${o}</span></button>`).join('')}
+    </div>
+    <div class="feedback-banner" id="feedbackBanner"></div>
+  `;
+  nextDot(qIndex);
+}
+
+function blitzAnswer(btn, selected) {
+  clearInterval(timer);
+  const q = qList[qIndex];
+  const correct = selected === q.answer;
+  document.querySelectorAll('.opt-btn').forEach(b=>{
+    b.disabled=true;
+    const txt = b.querySelector('span').textContent;
+    if(txt===q.answer) b.classList.add('correct');
+    else if(txt===selected && !correct) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('feedbackBanner');
+  if(correct){
+    correctCount++;
+    combo++;
+    const pts = 100 + (combo>1?50*(combo-1):0) + Math.round(timeLeft*5);
+    score+=pts;
+    spawnPoints(pts,'#4ade80');
+    if(combo>1) updateCombo(combo);
+    fb.className='feedback-banner correct';
+    fb.innerHTML=`✅ Correct!`;
+    markDot(qIndex,true);
+  } else {
+    wrongCount++;
+    combo=0;
+    score=Math.max(0,score-20);
+    fb.className='feedback-banner wrong';
+    const disp = selected ? `You chose: ${selected} — ` : 'Time up! ';
+    fb.innerHTML=`❌ ${disp}Answer: <strong>${q.answer}</strong>`;
+    markDot(qIndex,false);
+    spawnPoints(-20,'#f87171');
+  }
+  document.getElementById('scoreVal').textContent=score;
+  showStepsPanel(q.steps, q.answer);
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILL MODE — type answer, manual Next
+// ═══════════════════════════════════════════════════════════
+function startFill() {
+  score=0; combo=0; qIndex=0; correctCount=0; wrongCount=0;
+  pendingAdvance='fill';
+  qList = getActiveQuestions();
+  document.getElementById('scoreVal').textContent=0;
+  buildDots(TOTAL_Q,0);
+  applyTimerUI();
+  showScreen('game');
+  renderFillQ();
+}
+
+function renderFillQ() {
+  const q = qList[qIndex];
+  document.getElementById('qNumVal').textContent = qIndex+1;
+  document.getElementById('scoreVal').textContent = score;
+  startTimerBar(Q_TIME_FILL, 'timerBar', ()=>fillSubmit(true));
+
+  const wrap = document.getElementById('qWrapper');
+  wrap.innerHTML=`
+    <div class="question-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:0;">
+          <div class="q-type-label">Question ${qIndex+1} of ${TOTAL_Q} — Type Your Answer</div>
+          <div class="q-prompt" style="font-size:clamp(16px,3vw,24px);line-height:1.4;margin-bottom:16px">${q.q}</div>
+        </div>
+        <button id="nextBtn" onclick="advanceQuestion()" style="display:none;flex-shrink:0;background:linear-gradient(135deg,var(--teal),var(--purple));border:none;border-radius:12px;padding:12px 22px;font-family:'Fredoka One',cursive;font-size:18px;color:#fff;cursor:pointer;box-shadow:0 4px 18px rgba(0,212,170,0.4);white-space:nowrap;">
+          Next →
+        </button>
+      </div>
+    </div>
+    <div class="answer-input-wrap">
+      <input class="answer-input" id="fillAns" type="text" placeholder="Type your answer…" autocomplete="off">
+      <button class="submit-btn" onclick="fillSubmit(false)" id="submitBtn">Check ✓</button>
+    </div>
+    <div class="feedback-banner" id="feedbackBanner"></div>
+  `;
+  const inp = document.getElementById('fillAns');
+  inp.focus();
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') fillSubmit(false); });
+  wrap.dataset.correct = q.answer;
+  wrap.dataset.steps   = q.steps;
+  nextDot(qIndex);
+}
+
+function normalise(s) {
+  return s.trim().toLowerCase().replace(/\s+/g,'').replace(/[−–]/g,'-').replace(/×/g,'x');
+}
+
+function fillSubmit(timedOut) {
+  clearInterval(timer);
+  const wrap    = document.getElementById('qWrapper');
+  const inp     = document.getElementById('fillAns');
+  const correct = wrap.dataset.correct;
+  const steps   = wrap.dataset.steps;
+  const userAns = timedOut ? '' : (inp ? inp.value : '');
+  const isCorrect = !timedOut && normalise(userAns) === normalise(correct);
+
+  if(inp){ inp.disabled=true; inp.classList.add(isCorrect?'correct':'wrong'); }
+
+  const fb = document.getElementById('feedbackBanner');
+  if(isCorrect){
+    correctCount++;
+    combo++;
+    const pts = 120 + Math.round(timeLeft*5) + (combo>1?50*(combo-1):0);
+    score+=pts;
+    spawnPoints(pts,'#4ade80');
+    if(combo>1) updateCombo(combo);
+    fb.className='feedback-banner correct';
+    fb.innerHTML=`✅ Correct!`;
+    markDot(qIndex,true);
+  } else {
+    wrongCount++;
+    combo=0;
+    score=Math.max(0,score-20);
+    spawnPoints(-20,'#f87171');
+    fb.className='feedback-banner wrong';
+    fb.innerHTML=`❌ ${timedOut?'Time up! ':''}Answer: <strong>${correct}</strong>`;
+    markDot(qIndex,false);
+  }
+  document.getElementById('scoreVal').textContent=score;
+  const btn=document.getElementById('submitBtn');
+  if(btn) btn.disabled=true;
+  showStepsPanel(steps, correct);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHAIN MODE — manual Next after each answer
+// ═══════════════════════════════════════════════════════════
+let chainQ = null;
+let chainLocked = false;
+let chainPool = [];
+
+function startChain() {
+  chainStreak=0; score=0; chainLocked=false;
+  chainPool=shuffle(getActiveQuestions());
+  document.getElementById('chainScore').textContent='0';
+  document.getElementById('streakVal').textContent='0';
+  document.getElementById('bestVal').textContent=bestStreak;
+  document.getElementById('chainFeedback').className='feedback-banner';
+  document.getElementById('chainStepsPanel').style.display='none';
+  document.getElementById('chainNextBtn').style.display='none';
+  document.getElementById('chainNextBtn').textContent='Next Question →';
+  document.getElementById('chainNextBtn').onclick=()=>chainNext();
+  showScreen('chain-game');
+  nextChainQ();
+}
+
+function nextChainQ() {
+  chainLocked=false;
+  if(chainPool.length===0) chainPool=shuffle(getActiveQuestions());
+  const item=chainPool.pop();
+  const opts=shuffle([item.answer,...item.distractors]);
+  chainQ={item, opts};
+
+  document.getElementById('chainFeedback').className='feedback-banner';
+  document.getElementById('chainStepsPanel').style.display='none';
+  document.getElementById('chainNextBtn').style.display='none';
+
+  document.getElementById('chainQ').innerHTML=`
+    <span style="color:var(--text-muted);font-size:16px;display:block;margin-bottom:8px">Answer this:</span>
+    <span style="font-size:clamp(15px,3vw,22px);line-height:1.4">${item.q}</span>
+  `;
+  document.getElementById('chainOpts').innerHTML=opts.map(o=>`
+    <button class="chain-opt" onclick="chainAnswer(this,'${o.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
+      <span style="font-size:clamp(12px,2.5vw,18px)">${o}</span>
+    </button>
+  `).join('');
+}
+
+function chainAnswer(btn, selected) {
+  if(chainLocked) return;
+  chainLocked=true;
+  const correct = selected===chainQ.item.answer;
+  document.querySelectorAll('.chain-opt').forEach(b=>{
+    b.disabled=true;
+    const txt=b.querySelector('span').textContent;
+    if(txt===chainQ.item.answer) b.classList.add('correct');
+    else if(txt===selected && !correct) b.classList.add('wrong');
+  });
+
+  // Always show steps panel
+  document.getElementById('chainStepsText').innerHTML=chainQ.item.steps+
+    `<div style="margin-top:8px;font-family:'Fredoka One',cursive;font-size:17px;color:var(--yellow);">✅ Answer: ${chainQ.item.answer}</div>`;
+  document.getElementById('chainStepsPanel').style.display='block';
+
+  const fb=document.getElementById('chainFeedback');
+  if(correct){
+    chainStreak++;
+    if(chainStreak>bestStreak) bestStreak=chainStreak;
+    score+=50*(1+Math.floor(chainStreak/5));
+    document.getElementById('chainScore').textContent=chainStreak;
+    document.getElementById('streakVal').textContent=chainStreak;
+    document.getElementById('bestVal').textContent=bestStreak;
+    spawnPoints(50*(1+Math.floor(chainStreak/5)),'#4ade80');
+    fb.className='feedback-banner correct';
+    fb.innerHTML=`🔥 Correct! Streak: ${chainStreak}!`;
+    document.getElementById('chainNextBtn').textContent='Next Question →';
+    document.getElementById('chainNextBtn').onclick=()=>chainNext();
+  } else {
+    fb.className='feedback-banner wrong';
+    fb.innerHTML=`💔 Chain broken at ${chainStreak}! Answer: <strong>${chainQ.item.answer}</strong>`;
+    spawnPoints(0,'#f87171');
+    correctCount=chainStreak; wrongCount=1;
+    document.getElementById('chainNextBtn').textContent='See Results →';
+    document.getElementById('chainNextBtn').onclick=()=>showResults('chain');
+  }
+  document.getElementById('chainNextBtn').style.display='inline-block';
+}
+
+function chainNext(){
+  nextChainQ();
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════════
+function showResults(mode) {
+  clearInterval(timer);
+  clearInterval(timerTick);
+  const pct=Math.round((correctCount/(correctCount+wrongCount||1))*100);
+  const trophy=pct>=90?'🏆':pct>=70?'🎉':pct>=50?'⭐':'📚';
+  const title=pct>=90?'Outstanding!':pct>=70?'Great Work!':pct>=50?'Good Effort!':'Keep Practising!';
+  const gradeCol=pct>=90?'var(--yellow)':pct>=70?'var(--teal)':pct>=50?'var(--blue)':'var(--red)';
+
+  document.getElementById('resultTrophy').textContent=trophy;
+  document.getElementById('resultTitle').textContent=title;
+  document.getElementById('resultScore').textContent=score;
+
+  const stats=document.getElementById('resultStats');
+  if(mode==='chain'){
+    stats.innerHTML=`
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--yellow)">${correctCount}</div><div class="result-stat-lbl">Best Streak</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--teal)">${score}</div><div class="result-stat-lbl">Points</div></div>
+    `;
+  } else {
+    stats.innerHTML=`
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--green)">${correctCount}</div><div class="result-stat-lbl">Correct</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--red)">${wrongCount}</div><div class="result-stat-lbl">Wrong</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--blue)">${pct}%</div><div class="result-stat-lbl">Accuracy</div></div>
+    `;
+  }
+
+  const gradeEl=document.getElementById('resultGrade');
+  gradeEl.style.cssText=`background:${gradeCol}22;color:${gradeCol};border:2px solid ${gradeCol}44;`;
+  gradeEl.textContent=mode==='chain'?`🔥 Chain Master — ${bestStreak} streak!`:
+    pct>=90?'🌟 Excellent — Full marks territory!':
+    pct>=70?'⭐ Good job — Keep it up!':
+    pct>=50?'📚 Getting there — Review the steps!':
+    '🔄 Practise more — Read the step-by-step hints!';
+
+  showScreen('results');
+}
+
+function replayMode() {
+  if(currentMode==='blitz') startBlitz();
+  else if(currentMode==='fill') startFill();
+  else if(currentMode==='chain') startChain();
+}
+</script>
+</body>
+</html>
