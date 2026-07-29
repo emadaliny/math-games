@@ -1,0 +1,5667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spiral Revision – Year 7 Maths</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0c29;
+  --card: rgba(255,255,255,0.06);
+  --card-border: rgba(255,255,255,0.12);
+  --teal: #00d4aa;
+  --pink: #ff6b9d;
+  --yellow: #ffd93d;
+  --purple: #a855f7;
+  --blue: #38bdf8;
+  --orange: #fb923c;
+  --green: #4ade80;
+  --red: #f87171;
+  --text: #f0f0f0;
+  --text-muted: rgba(255,255,255,0.5);
+  --radius: 20px;
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  font-family:'Nunito',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(168,85,247,0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(0,212,170,0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(56,189,248,0.08) 0%, transparent 70%);
+}
+
+/* ── FLOATING PARTICLES ─────────────────────────────── */
+.particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.particle {
+  position:absolute;
+  border-radius:50%;
+  animation: float linear infinite;
+  opacity:0.4;
+}
+@keyframes float {
+  from { transform: translateY(100vh) rotate(0deg); }
+  to   { transform: translateY(-100px) rotate(720deg); }
+}
+
+/* ── SCREENS ──────────────────────────────────────────── */
+.screen { display:none; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
+
+/* ── HOME SCREEN ────────────────────────────────────── */
+#home {
+  text-align:center;
+  gap:28px;
+}
+.logo-badge {
+  background: linear-gradient(135deg, var(--teal), var(--purple));
+  border-radius:24px;
+  padding:12px 28px;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  display:inline-block;
+  margin-bottom:4px;
+}
+.game-title {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(52px, 10vw, 88px);
+  line-height:1;
+  background: linear-gradient(135deg, var(--yellow) 0%, var(--pink) 50%, var(--purple) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter: drop-shadow(0 0 40px rgba(255,107,157,0.4));
+  animation: titlePulse 3s ease-in-out infinite;
+}
+@keyframes titlePulse {
+  0%,100% { filter: drop-shadow(0 0 30px rgba(255,107,157,0.4)); }
+  50% { filter: drop-shadow(0 0 60px rgba(168,85,247,0.6)); }
+}
+.game-subtitle {
+  font-size:18px;
+  color:var(--text-muted);
+  font-weight:600;
+  margin-top:-8px;
+}
+
+/* Mode cards */
+.mode-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap:16px;
+  width:100%;
+  max-width:900px;
+  margin-top:8px;
+}
+.mode-card {
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:var(--radius);
+  padding:28px 22px;
+  cursor:pointer;
+  transition:all 0.3s cubic-bezier(.34,1.56,.64,1);
+  text-align:left;
+  position:relative;
+  overflow:hidden;
+  backdrop-filter:blur(10px);
+}
+.mode-card::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity 0.3s;
+  border-radius:var(--radius);
+}
+.mode-card:hover { transform:translateY(-6px) scale(1.02); border-color:rgba(255,255,255,0.3); }
+.mode-card:hover::before { opacity:1; }
+.mode-card.mode-blitz::before { background:linear-gradient(135deg,rgba(255,93,143,0.2),rgba(255,107,157,0.05)); }
+.mode-card.mode-fill::before  { background:linear-gradient(135deg,rgba(255,217,61,0.2),rgba(251,146,60,0.05)); }
+.mode-card.mode-chain::before { background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(56,189,248,0.05)); }
+.mode-icon { font-size:40px; margin-bottom:12px; display:block; }
+.mode-name {
+  font-family:'Fredoka One',cursive;
+  font-size:24px;
+  margin-bottom:6px;
+}
+.mode-blitz .mode-name  { color:var(--pink); }
+.mode-fill  .mode-name  { color:var(--yellow); }
+.mode-chain .mode-name  { color:var(--purple); }
+.mode-desc { font-size:13px; color:var(--text-muted); line-height:1.5; }
+.mode-badge {
+  position:absolute;
+  top:14px; right:14px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  padding:3px 8px;
+  border-radius:6px;
+}
+.mode-blitz .mode-badge  { background:rgba(255,107,157,0.2); color:var(--pink); }
+.mode-fill  .mode-badge  { background:rgba(255,217,61,0.2); color:var(--yellow); }
+.mode-chain .mode-badge  { background:rgba(168,85,247,0.2); color:var(--purple); }
+
+.leaderboard-btn {
+  background:transparent;
+  border:1.5px solid var(--card-border);
+  border-radius:12px;
+  padding:10px 24px;
+  color:var(--text-muted);
+  font-family:'Nunito',sans-serif;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.leaderboard-btn:hover { border-color:var(--yellow); color:var(--yellow); }
+
+/* ── DIFFICULTY PICKER ──────────────────────────────── */
+#difficulty { gap:24px; text-align:center; }
+.diff-title { font-family:'Fredoka One',cursive; font-size:36px; color:var(--yellow); }
+.diff-grid { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+.diff-btn {
+  background:var(--card);
+  border:2px solid var(--card-border);
+  border-radius:16px;
+  padding:20px 30px;
+  cursor:pointer;
+  transition:all 0.25s;
+  font-family:'Nunito',sans-serif;
+  text-align:center;
+  color:var(--text);
+  min-width:140px;
+}
+.diff-btn:hover, .diff-btn.sel {
+  border-color:currentColor;
+  transform:scale(1.06);
+}
+.diff-btn.easy   { color:var(--green); }
+.diff-btn.medium { color:var(--yellow); }
+.diff-btn.hard   { color:var(--red); }
+.diff-icon  { font-size:32px; margin-bottom:6px; }
+.diff-label { font-family:'Fredoka One',cursive; font-size:20px; }
+.diff-hint  { font-size:11px; margin-top:4px; color:inherit; opacity:0.7; }
+
+/* ── GAME HEADER ────────────────────────────────────── */
+.game-header {
+  width:100%;
+  max-width:820px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+}
+.stat-pill {
+  background:var(--card);
+  border:1px solid var(--card-border);
+  border-radius:40px;
+  padding:8px 18px;
+  font-size:14px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  backdrop-filter:blur(8px);
+}
+.stat-pill .val { font-size:18px; font-family:'Fredoka One',cursive; }
+.timer-bar-wrap {
+  flex:1;
+  height:10px;
+  background:rgba(255,255,255,0.1);
+  border-radius:10px;
+  overflow:hidden;
+}
+.timer-bar {
+  height:100%;
+  background:linear-gradient(90deg, var(--teal), var(--blue));
+  border-radius:10px;
+  transition:width 1s linear;
+}
+.timer-bar.warn { background:linear-gradient(90deg, var(--yellow), var(--orange)); }
+.timer-bar.danger { background:linear-gradient(90deg, var(--red), var(--pink)); animation:pulse 0.4s infinite alternate; }
+@keyframes pulse { to { opacity:0.6; } }
+
+/* ── QUESTION CARD ───────────────────────────────────── */
+#game { gap:16px; }
+.q-wrapper {
+  width:100%;
+  max-width:820px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
+}
+.question-card {
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:var(--radius);
+  padding:32px;
+  width:100%;
+  text-align:center;
+  backdrop-filter:blur(12px);
+  position:relative;
+  overflow:hidden;
+}
+.question-card::after {
+  content:'';
+  position:absolute;
+  top:-60px; right:-60px;
+  width:160px; height:160px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(168,85,247,0.15), transparent 70%);
+  pointer-events:none;
+}
+.q-type-label {
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--teal);
+  margin-bottom:14px;
+}
+.q-prompt {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(22px,4vw,32px);
+  color:var(--text);
+  line-height:1.3;
+  margin-bottom:8px;
+}
+.q-value {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(48px,10vw,80px);
+  background:linear-gradient(135deg,var(--yellow),var(--pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  line-height:1;
+  margin:8px 0 16px;
+}
+.q-instruction {
+  font-size:15px;
+  color:var(--text-muted);
+  font-weight:600;
+}
+
+/* MCQ options */
+.options-grid {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+  width:100%;
+}
+.opt-btn {
+  background:var(--card);
+  border:2px solid var(--card-border);
+  border-radius:16px;
+  padding:18px 12px;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(18px,3.5vw,28px);
+  color:var(--text);
+  cursor:pointer;
+  transition:all 0.2s cubic-bezier(.34,1.56,.64,1);
+  backdrop-filter:blur(8px);
+  position:relative;
+  overflow:hidden;
+}
+.opt-btn::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity 0.2s;
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(56,189,248,0.1));
+}
+.opt-btn:hover:not(:disabled) { transform:scale(1.04) translateY(-2px); border-color:var(--purple); }
+.opt-btn:hover:not(:disabled)::before { opacity:1; }
+.opt-btn.correct { border-color:var(--green) !important; background:rgba(74,222,128,0.15) !important; color:var(--green) !important; }
+.opt-btn.wrong   { border-color:var(--red) !important; background:rgba(248,113,113,0.15) !important; color:var(--red) !important; }
+.opt-btn:disabled { cursor:default; }
+
+/* Text input style */
+.answer-input-wrap {
+  display:flex;
+  gap:12px;
+  width:100%;
+  align-items:center;
+}
+.answer-input {
+  flex:1;
+  background:rgba(255,255,255,0.06);
+  border:2px solid var(--card-border);
+  border-radius:14px;
+  padding:16px 20px;
+  font-family:'Fredoka One',cursive;
+  font-size:28px;
+  color:var(--text);
+  text-align:center;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.answer-input:focus { border-color:var(--teal); }
+.answer-input.correct { border-color:var(--green); background:rgba(74,222,128,0.1); }
+.answer-input.wrong   { border-color:var(--red); background:rgba(248,113,113,0.1); }
+.submit-btn {
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  border:none;
+  border-radius:14px;
+  padding:16px 28px;
+  font-family:'Fredoka One',cursive;
+  font-size:20px;
+  color:#0f0c29;
+  cursor:pointer;
+  transition:transform 0.2s;
+  white-space:nowrap;
+}
+.submit-btn:hover:not(:disabled) { transform:scale(1.06); }
+.submit-btn:disabled { opacity:0.4; cursor:default; }
+
+/* Feedback */
+.feedback-banner {
+  width:100%;
+  border-radius:14px;
+  padding:14px 20px;
+  text-align:center;
+  font-family:'Fredoka One',cursive;
+  font-size:22px;
+  display:none;
+  animation:slideIn 0.3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideIn { from{ transform:translateY(20px);opacity:0; } to{ transform:translateY(0);opacity:1; } }
+.feedback-banner.correct { background:rgba(74,222,128,0.2); border:1.5px solid var(--green); color:var(--green); display:block; }
+.feedback-banner.wrong   { background:rgba(248,113,113,0.2); border:1.5px solid var(--red); color:var(--red); display:block; }
+.feedback-exp { font-size:13px; color:var(--text-muted); margin-top:6px; font-family:'Nunito',sans-serif; font-weight:700; }
+
+/* Progress dots */
+.progress-dots { display:flex; gap:6px; }
+.dot {
+  width:10px; height:10px; border-radius:50%;
+  background:rgba(255,255,255,0.15);
+  transition:all 0.3s;
+}
+.dot.done-correct { background:var(--green); }
+.dot.done-wrong   { background:var(--red); }
+.dot.current      { background:var(--yellow); transform:scale(1.4); }
+
+/* ── FILL BLANKS ─────────────────────────────────────── */
+.fill-row {
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:16px;
+  padding:20px 24px;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(18px,3vw,26px);
+  backdrop-filter:blur(8px);
+  position:relative;
+}
+.fill-given {
+  color:var(--text);
+}
+.fill-input {
+  background:rgba(255,255,255,0.08);
+  border-bottom:3px solid var(--teal);
+  border-top:none;
+  border-left:none;
+  border-right:none;
+  border-radius:4px;
+  padding:4px 12px;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(18px,3vw,26px);
+  color:var(--yellow);
+  text-align:center;
+  outline:none;
+  width:120px;
+  transition:border-color 0.2s;
+}
+.fill-input:focus { border-bottom-color:var(--purple); }
+.fill-input.correct { border-color:var(--green); color:var(--green); }
+.fill-input.wrong   { border-color:var(--red); color:var(--red); }
+.fill-equals { color:var(--text-muted); }
+
+/* ── CHAIN GAME ─────────────────────────────────────── */
+.chain-wrap {
+  width:100%;
+  max-width:820px;
+}
+.chain-question {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(24px,5vw,40px);
+  text-align:center;
+  margin:16px 0 24px;
+}
+.chain-options {
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.chain-opt {
+  background:var(--card);
+  border:2px solid var(--card-border);
+  border-radius:14px;
+  padding:14px 20px;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(16px,3vw,22px);
+  cursor:pointer;
+  color:var(--text);
+  transition:all 0.2s;
+  backdrop-filter:blur(8px);
+}
+.chain-opt:hover:not(:disabled) { border-color:var(--purple); transform:scale(1.05); }
+.chain-opt.correct { border-color:var(--green); color:var(--green); background:rgba(74,222,128,0.1); }
+.chain-opt.wrong   { border-color:var(--red); color:var(--red); background:rgba(248,113,113,0.1); animation:shake 0.4s ease; }
+.chain-score-display {
+  font-family:'Fredoka One',cursive;
+  font-size:60px;
+  text-align:center;
+  color:var(--yellow);
+  text-shadow: 0 0 40px rgba(255,217,61,0.6);
+}
+.chain-label { text-align:center; color:var(--text-muted); font-weight:700; font-size:14px; margin-top:-8px; }
+@keyframes shake {
+  0%,100%{ transform:translateX(0); }
+  25%{ transform:translateX(-8px); }
+  75%{ transform:translateX(8px); }
+}
+
+/* ── RESULTS ──────────────────────────────────────────── */
+#results { gap:24px; text-align:center; }
+.result-trophy { font-size:80px; animation:bounce 1s ease infinite alternate; }
+@keyframes bounce { to { transform:translateY(-12px); } }
+.result-title {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(32px,7vw,52px);
+  background:linear-gradient(135deg,var(--yellow),var(--pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.result-score-big {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(60px,14vw,100px);
+  color:var(--yellow);
+  line-height:1;
+  text-shadow:0 0 60px rgba(255,217,61,0.5);
+}
+.result-stats {
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.result-stat {
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:16px;
+  padding:16px 24px;
+  min-width:120px;
+  backdrop-filter:blur(8px);
+}
+.result-stat-val { font-family:'Fredoka One',cursive; font-size:32px; }
+.result-stat-lbl { font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+.result-grade {
+  font-family:'Fredoka One',cursive;
+  font-size:22px;
+  padding:10px 28px;
+  border-radius:40px;
+  display:inline-block;
+}
+.btn-row { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+.btn-primary {
+  background:linear-gradient(135deg,var(--teal),var(--purple));
+  border:none; border-radius:14px;
+  padding:14px 32px;
+  font-family:'Fredoka One',cursive;
+  font-size:20px; color:#fff;
+  cursor:pointer;
+  transition:transform 0.2s, box-shadow 0.2s;
+  box-shadow:0 4px 24px rgba(0,212,170,0.3);
+}
+.btn-primary:hover { transform:scale(1.06); box-shadow:0 6px 32px rgba(0,212,170,0.5); }
+.btn-secondary {
+  background:transparent;
+  border:2px solid var(--card-border);
+  border-radius:14px;
+  padding:14px 32px;
+  font-family:'Fredoka One',cursive;
+  font-size:20px; color:var(--text-muted);
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-secondary:hover { border-color:var(--text-muted); color:var(--text); }
+
+/* ── FORMULA STRIP ───────────────────────────────────── */
+.formula-strip {
+  background:rgba(0,212,170,0.05);
+  border:1px solid rgba(0,212,170,0.2);
+  border-radius:12px;
+  padding:10px 16px;
+  font-size:12px;
+  color:var(--teal);
+  font-weight:700;
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  justify-content:center;
+  max-width:820px;
+  width:100%;
+}
+
+/* ── COMBO DISPLAY ────────────────────────────────────── */
+.combo-badge {
+  position:fixed;
+  top:20px; right:20px;
+  background:linear-gradient(135deg,var(--yellow),var(--orange));
+  border-radius:14px;
+  padding:8px 18px;
+  font-family:'Fredoka One',cursive;
+  font-size:20px;
+  color:#0f0c29;
+  z-index:100;
+  transform:scale(0);
+  transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
+}
+.combo-badge.show { transform:scale(1); }
+
+/* ── POINTS POP ─────────────────────────────────────── */
+.points-pop {
+  position:fixed;
+  font-family:'Fredoka One',cursive;
+  font-size:28px;
+  pointer-events:none;
+  z-index:200;
+  animation:pointsPop 1.2s ease forwards;
+}
+@keyframes pointsPop {
+  0%   { transform:translateY(0) scale(0.5); opacity:1; }
+  50%  { transform:translateY(-60px) scale(1.2); opacity:1; }
+  100% { transform:translateY(-120px) scale(0.8); opacity:0; }
+}
+
+/* ── BACK BTN ────────────────────────────────────────── */
+.back-btn {
+  position:fixed;
+  top:16px; left:16px;
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:12px;
+  padding:8px 16px;
+  font-family:'Nunito',sans-serif;
+  font-size:14px;
+  font-weight:700;
+  color:var(--text-muted);
+  cursor:pointer;
+  z-index:50;
+  transition:all 0.2s;
+  backdrop-filter:blur(8px);
+  display:none;
+}
+.back-btn:hover { color:var(--text); border-color:rgba(255,255,255,0.3); }
+.back-btn.visible { display:block; }
+
+/* ── HOW-TO-CONVERT reference ─────────────────────────── */
+.reference-strip {
+  width:100%;
+  max-width:820px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.ref-card {
+  background:var(--card);
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding:12px;
+  text-align:center;
+  backdrop-filter:blur(8px);
+  font-size:12px;
+}
+.ref-title { font-weight:800; margin-bottom:6px; font-size:11px; letter-spacing:1px; text-transform:uppercase; }
+.ref-rule { font-size:13px; font-weight:700; margin:2px 0; }
+.ref-eg { font-size:11px; color:var(--text-muted); }
+
+/* ── LEVEL SELECT ─────────────────────────────────────── */
+.next-btn {
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  border:none; border-radius:14px;
+  padding:14px 36px;
+  font-family:'Fredoka One',cursive;
+  font-size:22px; color:#0f0c29;
+  cursor:pointer;
+  width:100%;
+  max-width:400px;
+  transition:transform 0.2s;
+}
+.next-btn:hover { transform:scale(1.04); }
+
+/* Responsive */
+@media(max-width:600px){
+  .options-grid { grid-template-columns:1fr; }
+  .reference-strip { grid-template-columns:1fr; }
+  .mode-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Floating Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Back Button -->
+<button class="back-btn" id="backBtn" onclick="goHome()">← Menu</button>
+
+<!-- Combo Badge -->
+<div class="combo-badge" id="comboBadge">🔥 COMBO x<span id="comboCount">2</span></div>
+
+<!-- ════════════════════════════════════
+     HOME
+════════════════════════════════════ -->
+<div class="screen active" id="home">
+  <div class="logo-badge">Year 7 Mathematics</div>
+  <div class="game-title">Spiral Revision</div>
+  <div class="game-subtitle" id="homeSubtitle">Term 3, 2026</div>
+
+  <!-- Set Selector -->
+  <div style="width:100%;max-width:700px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);border-radius:20px;padding:20px 24px;backdrop-filter:blur(10px);">
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:14px;">📅 Select Your Lesson Set</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
+        <label style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;">Week</label>
+        <select id="weekSelect" onchange="updateSetOptions()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;outline:none;">
+          <option value="1">Week 1</option>
+          <option value="2">Week 2</option>
+          <option value="3">Week 3</option>
+          <option value="4">Week 4</option>
+          <option value="5">Week 5</option>
+          <option value="6">Week 6</option>
+          <option value="7">Week 7</option>
+          <option value="8">Week 8</option>
+          <option value="9">Week 9</option>
+          <option value="10">Week 10</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
+        <label style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;">Lesson Set</label>
+        <select id="setSelect" onchange="updateSelectedSet()" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;outline:none;">
+          <option value="1">Set 1</option>
+          <option value="2">Set 2</option>
+          <option value="3">Set 3</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px;">
+        <label style="font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;">Selected</label>
+        <div id="selectedSetLabel" style="background:linear-gradient(135deg,rgba(0,212,170,0.2),rgba(168,85,247,0.2));border:1.5px solid var(--teal);border-radius:10px;padding:10px 14px;font-family:'Fredoka One',cursive;font-size:16px;color:var(--teal);">Week 1 · Set 1</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mode-grid">
+    <div class="mode-card mode-blitz" onclick="launchDirect('blitz')">
+      <span class="mode-badge">MCQ</span>
+      <span class="mode-icon">⚡</span>
+      <div class="mode-name">Blitz Quiz</div>
+      <div class="mode-desc">Answer 12 questions with multiple choice options. Select the correct answer!</div>
+    </div>
+
+    <div class="mode-card mode-fill" onclick="launchDirect('fill')">
+      <span class="mode-badge">TYPE IT</span>
+      <span class="mode-icon">✍️</span>
+      <div class="mode-name">Fill the Gaps</div>
+      <div class="mode-desc">Type the answer to each question. Show what you know!</div>
+    </div>
+    <div class="mode-card mode-chain" onclick="launchDirect('chain')">
+      <span class="mode-badge">STREAK</span>
+      <span class="mode-icon">🔥</span>
+      <div class="mode-name">Chain Reaction</div>
+      <div class="mode-desc">Build the longest correct streak you can. One wrong answer ends the chain!</div>
+    </div>
+  </div>
+
+  <!-- Teacher Controls -->
+  <div style="margin-top:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;">
+    <span style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;">⚙️ Teacher Controls</span>
+    <button id="timerToggleBtn" onclick="toggleTimer()" style="background:rgba(0,212,170,0.15);border:1.5px solid var(--teal);border-radius:10px;padding:8px 18px;color:var(--teal);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.2s;">⏱ Timer: ON</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     BLITZ / FILL GAME SCREEN
+════════════════════════════════════ -->
+<div class="screen" id="game">
+  <div class="game-header" id="gameHeader">
+    <div class="stat-pill">⚡ <span class="val" id="scoreVal">0</span> pts</div>
+    <div class="timer-bar-wrap" id="timerBarWrap"><div class="timer-bar" id="timerBar" style="width:100%"></div></div>
+    <div class="stat-pill" id="timerSecsPill">⏱ <span class="val" id="timerSecs">–</span>s</div>
+    <div class="stat-pill">Q <span class="val" id="qNumVal">1</span>/12</div>
+  </div>
+  <div class="progress-dots" id="progressDots"></div>
+  <div class="q-wrapper" id="qWrapper">
+    <!-- injected by JS -->
+  </div>
+  <div class="formula-strip" id="formulaStrip" style="display:none"></div>
+</div>
+
+
+
+<!-- ════════════════════════════════════
+     CHAIN GAME SCREEN
+════════════════════════════════════ -->
+<div class="screen" id="chain-game">
+  <div class="game-header" style="justify-content:center">
+    <div class="stat-pill">🔥 Streak: <span class="val" id="streakVal">0</span></div>
+    <div class="stat-pill">🏆 Best: <span class="val" id="bestVal">0</span></div>
+  </div>
+  <div class="chain-wrap">
+    <div class="chain-score-display" id="chainScore">0</div>
+    <div class="chain-label">CURRENT STREAK</div>
+    <div class="chain-question" id="chainQ"></div>
+    <div class="chain-options" id="chainOpts"></div>
+    <div class="feedback-banner" id="chainFeedback"></div>
+    <!-- Step-by-step answer panel for chain mode -->
+    <div id="chainStepsPanel" style="display:none;margin-top:12px;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.35);border-radius:14px;padding:16px 20px;text-align:left;max-width:700px;margin-left:auto;margin-right:auto;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:8px;">📋 Step-by-Step Answer</div>
+      <div id="chainStepsText" style="font-size:14px;color:var(--text);font-family:'Nunito',sans-serif;font-weight:700;line-height:1.7;"></div>
+    </div>
+    <button id="chainNextBtn" onclick="chainNext()" style="display:none;margin-top:16px;background:linear-gradient(135deg,var(--teal),var(--purple));border:none;border-radius:14px;padding:14px 40px;font-family:'Fredoka One',cursive;font-size:22px;color:#fff;cursor:pointer;transition:transform 0.2s;box-shadow:0 4px 24px rgba(0,212,170,0.35);">
+      Next Question →
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     RESULTS
+════════════════════════════════════ -->
+<div class="screen" id="results">
+  <div class="result-trophy" id="resultTrophy">🏆</div>
+  <div class="result-title" id="resultTitle">Fantastic!</div>
+  <div class="result-score-big" id="resultScore">0</div>
+  <div style="color:var(--text-muted);font-weight:700;margin-top:-12px">POINTS</div>
+  <div class="result-stats" id="resultStats"></div>
+  <div class="result-grade" id="resultGrade"></div>
+  <div class="btn-row">
+    <button class="btn-primary" id="replayBtn" onclick="replayMode()">Play Again</button>
+    <button class="btn-secondary" onclick="goHome()">Menu</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// QUESTION DATA  —  Set 1: Week 1 Lesson 1, Term 3, 2026
+// Each question: { q, answer, steps, opts (3 wrong distractors) }
+// ═══════════════════════════════════════════════════════════
+const ALL_QUESTIONS = [
+  {
+    "id": 1,
+    "q": "3/4 − 1/4 = ?",
+    "answer": "1/2",
+    "steps": "Same denominator, so subtract the numerators: 3 − 1 = 2. Keep the denominator 4: 2/4, which simplifies to 1/2.",
+    "distractors": [
+      "2",
+      "2/4",
+      "2/2"
+    ]
+  },
+  {
+    "id": 2,
+    "q": "4/6 − 1/6 = ?",
+    "answer": "1/2",
+    "steps": "Same denominator, so subtract the numerators: 4 − 1 = 3. Keep the denominator 6: 3/6, which simplifies to 1/2.",
+    "distractors": [
+      "2",
+      "2/2",
+      "3/6"
+    ]
+  },
+  {
+    "id": 3,
+    "q": "Convert 12% to a decimal.",
+    "answer": "0.12",
+    "steps": "To convert a percentage to a decimal, divide by 100: 12% ÷ 100 = 0.12.",
+    "distractors": [
+      "120",
+      "1.2",
+      "0.012"
+    ]
+  },
+  {
+    "id": 4,
+    "q": "Convert 1/5 to a percentage.",
+    "answer": "20%",
+    "steps": "Divide the numerator by the denominator, then multiply by 100: (1÷5)×100 = 20%.",
+    "distractors": [
+      "200%",
+      "2%",
+      "80%"
+    ]
+  },
+  {
+    "id": 5,
+    "q": "Convert 12 days to hours.",
+    "answer": "288 hours",
+    "steps": "To convert days to hours, multiply by 24: 12 × 24 = 288 hours.",
+    "distractors": [
+      "312 hours",
+      "28.8 hours",
+      "12 hours"
+    ]
+  },
+  {
+    "id": 6,
+    "q": "Convert 8 days to hours.",
+    "answer": "192 hours",
+    "steps": "To convert days to hours, multiply by 24: 8 × 24 = 192 hours.",
+    "distractors": [
+      "216 hours",
+      "19.2 hours",
+      "8 hours"
+    ]
+  },
+  {
+    "id": 7,
+    "q": "In the expression 3^5, what is the index (power)?",
+    "answer": "5",
+    "steps": "The index (power) shows how many times the base is multiplied by itself. In 3^5, the index is 5.",
+    "distractors": [
+      "8",
+      "15",
+      "3"
+    ]
+  },
+  {
+    "id": 8,
+    "q": "In the expression 9^2, what is the index (power)?",
+    "answer": "2",
+    "steps": "The index (power) shows how many times the base is multiplied by itself. In 9^2, the index is 2.",
+    "distractors": [
+      "18",
+      "9",
+      "11"
+    ]
+  },
+  {
+    "id": 9,
+    "q": "Which of the following is the largest number? -1/2, -2, 4, -1",
+    "answer": "4",
+    "steps": "Placing all values on a number line from smallest to largest gives: -2, -1, -1/2, 4. The largest is 4.",
+    "distractors": [
+      "-2",
+      "-1",
+      "-1/2"
+    ]
+  },
+  {
+    "id": 10,
+    "q": "Which of the following is the smallest number? 0.5, -6, 3.5, 2/5",
+    "answer": "-6",
+    "steps": "Placing all values on a number line from smallest to largest gives: -6, 2/5, 0.5, 3.5. The smallest is -6.",
+    "distractors": [
+      "0.5",
+      "2/5",
+      "3.5"
+    ]
+  },
+  {
+    "id": 11,
+    "q": "What is the value of 19^2?",
+    "answer": "361",
+    "steps": "19^2 means 19 × 19 = 361.",
+    "distractors": [
+      "21",
+      "38",
+      "380"
+    ]
+  },
+  {
+    "id": 12,
+    "q": "Calculate 2^3.",
+    "answer": "8",
+    "steps": "2^3 means 2 × 2 × 2 = 8.",
+    "distractors": [
+      "5",
+      "10",
+      "6"
+    ]
+  }
+];
+
+const ALL_SETS = [
+  {
+    "week": 1,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "3/4 − 1/4 = ?",
+        "answer": "1/2",
+        "steps": "Same denominator, so subtract the numerators: 3 − 1 = 2. Keep the denominator 4: 2/4, which simplifies to 1/2.",
+        "distractors": [
+          "2",
+          "2/4",
+          "2/2"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "4/6 − 1/6 = ?",
+        "answer": "1/2",
+        "steps": "Same denominator, so subtract the numerators: 4 − 1 = 3. Keep the denominator 6: 3/6, which simplifies to 1/2.",
+        "distractors": [
+          "2",
+          "2/2",
+          "3/6"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 12% to a decimal.",
+        "answer": "0.12",
+        "steps": "To convert a percentage to a decimal, divide by 100: 12% ÷ 100 = 0.12.",
+        "distractors": [
+          "120",
+          "1.2",
+          "0.012"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Convert 1/5 to a percentage.",
+        "answer": "20%",
+        "steps": "Divide the numerator by the denominator, then multiply by 100: (1÷5)×100 = 20%.",
+        "distractors": [
+          "200%",
+          "2%",
+          "80%"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Convert 12 days to hours.",
+        "answer": "288 hours",
+        "steps": "To convert days to hours, multiply by 24: 12 × 24 = 288 hours.",
+        "distractors": [
+          "312 hours",
+          "28.8 hours",
+          "12 hours"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Convert 8 days to hours.",
+        "answer": "192 hours",
+        "steps": "To convert days to hours, multiply by 24: 8 × 24 = 192 hours.",
+        "distractors": [
+          "216 hours",
+          "19.2 hours",
+          "8 hours"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "In the expression 3^5, what is the index (power)?",
+        "answer": "5",
+        "steps": "The index (power) shows how many times the base is multiplied by itself. In 3^5, the index is 5.",
+        "distractors": [
+          "8",
+          "15",
+          "3"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "In the expression 9^2, what is the index (power)?",
+        "answer": "2",
+        "steps": "The index (power) shows how many times the base is multiplied by itself. In 9^2, the index is 2.",
+        "distractors": [
+          "18",
+          "9",
+          "11"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Which of the following is the largest number? -1/2, -2, 4, -1",
+        "answer": "4",
+        "steps": "Placing all values on a number line from smallest to largest gives: -2, -1, -1/2, 4. The largest is 4.",
+        "distractors": [
+          "-2",
+          "-1",
+          "-1/2"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Which of the following is the smallest number? 0.5, -6, 3.5, 2/5",
+        "answer": "-6",
+        "steps": "Placing all values on a number line from smallest to largest gives: -6, 2/5, 0.5, 3.5. The smallest is -6.",
+        "distractors": [
+          "0.5",
+          "2/5",
+          "3.5"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "What is the value of 19^2?",
+        "answer": "361",
+        "steps": "19^2 means 19 × 19 = 361.",
+        "distractors": [
+          "21",
+          "38",
+          "380"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Calculate 2^3.",
+        "answer": "8",
+        "steps": "2^3 means 2 × 2 × 2 = 8.",
+        "distractors": [
+          "5",
+          "10",
+          "6"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 1,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "4/6 − 3/6 = ?",
+        "answer": "1/6",
+        "steps": "Same denominator, so subtract the numerators: 4 − 3 = 1. Keep the denominator 6: 1/6, which simplifies to 1/6.",
+        "distractors": [
+          "6",
+          "2/6",
+          "0/6"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "2/4 − 1/4 = ?",
+        "answer": "1/4",
+        "steps": "Same denominator, so subtract the numerators: 2 − 1 = 1. Keep the denominator 4: 1/4, which simplifies to 1/4.",
+        "distractors": [
+          "2/4",
+          "0/4",
+          "4"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 0.02 to a percentage.",
+        "answer": "2%",
+        "steps": "To convert a decimal to a percentage, multiply by 100: 0.02 × 100 = 2%.",
+        "distractors": [
+          "0.2%",
+          "12%",
+          "0.002%"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Convert 25% to a simplified fraction.",
+        "answer": "1/4",
+        "steps": "Write the percentage over 100: 25/100, then simplify to get 1/4.",
+        "distractors": [
+          "4",
+          "2/4",
+          "25/100"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Convert 8000 g to kg.",
+        "answer": "8 kg",
+        "steps": "To convert g to kg, divide by 1000: 8000 ÷ 1000 = 8 kg.",
+        "distractors": [
+          "80 kg",
+          "8000 kg",
+          "9 kg"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Convert 2 years to days.",
+        "answer": "730 days",
+        "steps": "To convert years to days, multiply by 365: 2 × 365 = 730 days.",
+        "distractors": [
+          "1095 days",
+          "2 days",
+          "73 days"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "5^3 can be written as:",
+        "answer": "5 × 5 × 5",
+        "steps": "5^3 means 5 multiplied by itself 3 times: 5 × 5 × 5.",
+        "distractors": [
+          "5 × 3",
+          "15",
+          "3 × 3 × 3 × 3 × 3"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "In 11^4, what are the base and index (power)?",
+        "answer": "base = 11, index = 4",
+        "steps": "The base is the number being multiplied (11). The index (power) shows how many times it's multiplied by itself (4).",
+        "distractors": [
+          "base = 4, index = 11",
+          "base = 4, index = 4",
+          "base = 11, index = 11"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Which of the following is the largest number? -1/2, 0.4, 1/4, 1/3",
+        "answer": "0.4",
+        "steps": "Placing all values on a number line from smallest to largest gives: -1/2, 1/4, 1/3, 0.4. The largest is 0.4.",
+        "distractors": [
+          "-1/2",
+          "1/3",
+          "1/4"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Which of the following is the largest number? -10, 1/4, -2.5, 3.5",
+        "answer": "3.5",
+        "steps": "Placing all values on a number line from smallest to largest gives: -10, -2.5, 1/4, 3.5. The largest is 3.5.",
+        "distractors": [
+          "1/4",
+          "-10",
+          "-2.5"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "3^2 = ?",
+        "answer": "9",
+        "steps": "3^2 means 3 × 3 = 9.",
+        "distractors": [
+          "12",
+          "5",
+          "6"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "18^2 = ?",
+        "answer": "324",
+        "steps": "18^2 means 18 × 18 = 324.",
+        "distractors": [
+          "36",
+          "342",
+          "20"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 1,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "3/10 + 5/10 = ?",
+        "answer": "4/5",
+        "steps": "Same denominator, so add the numerators: 3 + 5 = 8. Keep the denominator 10: 8/10, which simplifies to 4/5.",
+        "distractors": [
+          "5/5",
+          "5/4",
+          "8/20"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "6/10 + 5/10 = ?",
+        "answer": "11/10",
+        "steps": "Same denominator, so add the numerators: 6 + 5 = 11. Keep the denominator 10: 11/10, which simplifies to 11/10.",
+        "distractors": [
+          "12/10",
+          "11/20",
+          "10/11"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 15% to a decimal.",
+        "answer": "0.15",
+        "steps": "To convert a percentage to a decimal, divide by 100: 15% ÷ 100 = 0.15.",
+        "distractors": [
+          "150",
+          "0.015",
+          "1.5"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Convert 35% to a decimal.",
+        "answer": "0.35",
+        "steps": "To convert a percentage to a decimal, divide by 100: 35% ÷ 100 = 0.35.",
+        "distractors": [
+          "0.035",
+          "350",
+          "3.5"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Convert 5000 m to km.",
+        "answer": "5 km",
+        "steps": "To convert m to km, divide by 1000: 5000 ÷ 1000 = 5 km.",
+        "distractors": [
+          "6 km",
+          "5000 km",
+          "50 km"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Convert 9 years to days.",
+        "answer": "3285 days",
+        "steps": "To convert years to days, multiply by 365: 9 × 365 = 3285 days.",
+        "distractors": [
+          "9 days",
+          "328.5 days",
+          "3650 days"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "In the expression 4^4, what is the base?",
+        "answer": "4",
+        "steps": "The base is the number being multiplied by itself. In 4^4, the base is 4.",
+        "distractors": [
+          "16",
+          "5",
+          "8"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "In 4^2, what are the base and index (power)?",
+        "answer": "base = 4, index = 2",
+        "steps": "The base is the number being multiplied (4). The index (power) shows how many times it's multiplied by itself (2).",
+        "distractors": [
+          "base = 2, index = 4",
+          "base = 2, index = 2",
+          "base = 4, index = 4"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Which of the following is the largest number? -6, -3.5, -2, 0.25",
+        "answer": "0.25",
+        "steps": "Placing all values on a number line from smallest to largest gives: -6, -3.5, -2, 0.25. The largest is 0.25.",
+        "distractors": [
+          "-3.5",
+          "-2",
+          "-6"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Which of the following is the smallest number? -6, -3/8, -7, -0.2",
+        "answer": "-7",
+        "steps": "Placing all values on a number line from smallest to largest gives: -7, -6, -3/8, -0.2. The smallest is -7.",
+        "distractors": [
+          "-0.2",
+          "-3/8",
+          "-6"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "19^2 = ?",
+        "answer": "361",
+        "steps": "19^2 means 19 × 19 = 361.",
+        "distractors": [
+          "380",
+          "21",
+          "38"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "What is the value of 11^2?",
+        "answer": "121",
+        "steps": "11^2 means 11 × 11 = 121.",
+        "distractors": [
+          "22",
+          "13",
+          "132"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 2,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "4/5 + 3/5 = ?",
+        "answer": "7/5",
+        "steps": "Same denominator, so add the numerators: 4 + 3 = 7. Keep the denominator 5: 7/5, which simplifies to 7/5.",
+        "distractors": [
+          "5/7",
+          "7/10",
+          "8/5"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 4/5 to a percentage.",
+        "answer": "80%",
+        "steps": "Divide the numerator by the denominator, then multiply by 100: (4÷5)×100 = 80%.",
+        "distractors": [
+          "8%",
+          "800%",
+          "20%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 3 cm to mm.",
+        "answer": "30 mm",
+        "steps": "To convert cm to mm, multiply by 10: 3 × 10 = 30 mm.",
+        "distractors": [
+          "3 mm",
+          "40 mm",
+          "31 mm"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "In the expression 4^3, what is the index (power)?",
+        "answer": "3",
+        "steps": "The index (power) shows how many times the base is multiplied by itself. In 4^3, the index is 3.",
+        "distractors": [
+          "12",
+          "7",
+          "4"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "16^3 = ?",
+        "answer": "4096",
+        "steps": "16^3 means 16 × 16 × 16 = 4096.",
+        "distractors": [
+          "19",
+          "4112",
+          "48"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 2 and b = 8, evaluate 2a + 3b.",
+        "answer": "28",
+        "steps": "Substitute a = 2 and b = 8: 2×2 + 3×8 = 4 + 24 = 28.",
+        "distractors": [
+          "96",
+          "29",
+          "50"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Write an expression for 'a number, n, multiplied by 3 and then increased by 5'.",
+        "answer": "3n + 5",
+        "steps": "Multiplying the number n by 3 gives 3n. Increasing this by 5 gives 3n + 5.",
+        "distractors": [
+          "5n + 3",
+          "3(n + 5)",
+          "n + 3 + 5"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "If a = 3 and b = 2, evaluate 2a + 3b.",
+        "answer": "12",
+        "steps": "Substitute a = 3 and b = 2: 2×3 + 3×2 = 6 + 6 = 12.",
+        "distractors": [
+          "36",
+          "13",
+          "25"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Write an expression for 'a number, n, multiplied by 8 and then increased by 5'.",
+        "answer": "8n + 5",
+        "steps": "Multiplying the number n by 8 gives 8n. Increasing this by 5 gives 8n + 5.",
+        "distractors": [
+          "5n + 8",
+          "n + 8 + 5",
+          "8(n + 5)"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 8 and b = 3, evaluate 2a + 3b.",
+        "answer": "25",
+        "steps": "Substitute a = 8 and b = 3: 2×8 + 3×3 = 16 + 9 = 25.",
+        "distractors": [
+          "55",
+          "26",
+          "144"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Write an expression for 'a number, n, multiplied by 5 and then increased by 6'.",
+        "answer": "5n + 6",
+        "steps": "Multiplying the number n by 5 gives 5n. Increasing this by 6 gives 5n + 6.",
+        "distractors": [
+          "n + 5 + 6",
+          "5(n + 6)",
+          "6n + 5"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Write an expression for 'a number, n, multiplied by 9 and then increased by 5'.",
+        "answer": "9n + 5",
+        "steps": "Multiplying the number n by 9 gives 9n. Increasing this by 5 gives 9n + 5.",
+        "distractors": [
+          "9(n + 5)",
+          "n + 9 + 5",
+          "5n + 9"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 2,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "4/7 − 1/6 = ?",
+        "answer": "17/42",
+        "steps": "Find a common denominator: 7 and 6 both divide into 42. Rewrite as 24/42 and 7/42, then subtract: 24−7 = 17. Simplify 17/42 to 17/42.",
+        "distractors": [
+          "18/42",
+          "3",
+          "42/17"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 1/5 to a decimal.",
+        "answer": "0.2",
+        "steps": "Divide the numerator by the denominator: 1 ÷ 5 = 0.2.",
+        "distractors": [
+          "2.0",
+          "0.25",
+          "0.02"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 3650 days to years.",
+        "answer": "10 years",
+        "steps": "To convert days to years, divide by 365: 3650 ÷ 365 = 10 years.",
+        "distractors": [
+          "3650 years",
+          "100 years",
+          "11 years"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "In the expression 3^5, what is the base?",
+        "answer": "3",
+        "steps": "The base is the number being multiplied by itself. In 3^5, the base is 3.",
+        "distractors": [
+          "5",
+          "15",
+          "8"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Which of the following is the smallest number? -1/2, 6, 1/2, -4/5",
+        "answer": "-4/5",
+        "steps": "Placing all values on a number line from smallest to largest gives: -4/5, -1/2, 1/2, 6. The smallest is -4/5.",
+        "distractors": [
+          "-1/2",
+          "1/2",
+          "6"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 5, evaluate 4a + 3.",
+        "answer": "23",
+        "steps": "Substitute a = 5: 4×5 + 3 = 20 + 3 = 23.",
+        "distractors": [
+          "32",
+          "20",
+          "12"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "If a = 8, evaluate 2a + 4.",
+        "answer": "20",
+        "steps": "Substitute a = 8: 2×8 + 4 = 16 + 4 = 20.",
+        "distractors": [
+          "16",
+          "24",
+          "14"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "If a = 3 and b = 7, evaluate 2a + 3b.",
+        "answer": "27",
+        "steps": "Substitute a = 3 and b = 7: 2×3 + 3×7 = 6 + 21 = 27.",
+        "distractors": [
+          "126",
+          "50",
+          "28"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Write an expression for 'a number, n, multiplied by 7 and then increased by 5'.",
+        "answer": "7n + 5",
+        "steps": "Multiplying the number n by 7 gives 7n. Increasing this by 5 gives 7n + 5.",
+        "distractors": [
+          "7(n + 5)",
+          "5n + 7",
+          "n + 7 + 5"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 5, evaluate 5a + 10.",
+        "answer": "35",
+        "steps": "Substitute a = 5: 5×5 + 10 = 25 + 10 = 35.",
+        "distractors": [
+          "75",
+          "20",
+          "25"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "If a = 7, evaluate 6a + 8.",
+        "answer": "50",
+        "steps": "Substitute a = 7: 6×7 + 8 = 42 + 8 = 50.",
+        "distractors": [
+          "21",
+          "42",
+          "90"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "If a = 2 and b = 4, evaluate 2a + 3b.",
+        "answer": "16",
+        "steps": "Substitute a = 2 and b = 4: 2×2 + 3×4 = 4 + 12 = 16.",
+        "distractors": [
+          "30",
+          "48",
+          "17"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 2,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "Convert 50% to a simplified fraction.",
+        "answer": "1/2",
+        "steps": "Write the percentage over 100: 50/100, then simplify to get 1/2.",
+        "distractors": [
+          "2/2",
+          "50/100",
+          "2"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 7 hours to min.",
+        "answer": "420 min",
+        "steps": "To convert hours to min, multiply by 60: 7 × 60 = 420 min.",
+        "distractors": [
+          "42 min",
+          "7 min",
+          "480 min"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In the expression 5^4, what is the base?",
+        "answer": "5",
+        "steps": "The base is the number being multiplied by itself. In 5^4, the base is 5.",
+        "distractors": [
+          "4",
+          "9",
+          "20"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? 1/2, 1.5, 5, -1/3",
+        "answer": "5",
+        "steps": "Placing all values on a number line from smallest to largest gives: -1/3, 1/2, 1.5, 5. The largest is 5.",
+        "distractors": [
+          "1/2",
+          "1.5",
+          "-1/3"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "15^3 = ?",
+        "answer": "3375",
+        "steps": "15^3 means 15 × 15 × 15 = 3375.",
+        "distractors": [
+          "18",
+          "45",
+          "3390"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 9, evaluate 5a + 9.",
+        "answer": "54",
+        "steps": "Substitute a = 9: 5×9 + 9 = 45 + 9 = 54.",
+        "distractors": [
+          "45",
+          "23",
+          "90"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "If a = 2, evaluate 6a + 10.",
+        "answer": "22",
+        "steps": "Substitute a = 2: 6×2 + 10 = 12 + 10 = 22.",
+        "distractors": [
+          "72",
+          "18",
+          "12"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "If a = 4, evaluate 5a + 6.",
+        "answer": "26",
+        "steps": "Substitute a = 4: 5×4 + 6 = 20 + 6 = 26.",
+        "distractors": [
+          "50",
+          "20",
+          "15"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "If a = 9 and b = 5, evaluate 2a + 3b.",
+        "answer": "33",
+        "steps": "Substitute a = 9 and b = 5: 2×9 + 3×5 = 18 + 15 = 33.",
+        "distractors": [
+          "270",
+          "34",
+          "70"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 7 and b = 4, evaluate 2a + 3b.",
+        "answer": "26",
+        "steps": "Substitute a = 7 and b = 4: 2×7 + 3×4 = 14 + 12 = 26.",
+        "distractors": [
+          "55",
+          "27",
+          "168"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "If a = 6 and b = 7, evaluate 2a + 3b.",
+        "answer": "33",
+        "steps": "Substitute a = 6 and b = 7: 2×6 + 3×7 = 12 + 21 = 33.",
+        "distractors": [
+          "252",
+          "65",
+          "34"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "If a = 7, evaluate 5a + 10.",
+        "answer": "45",
+        "steps": "Substitute a = 7: 5×7 + 10 = 35 + 10 = 45.",
+        "distractors": [
+          "35",
+          "85",
+          "22"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 3,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "2/4 − 1/5 = ?",
+        "answer": "3/10",
+        "steps": "Find a common denominator: 4 and 5 both divide into 20. Rewrite as 10/20 and 4/20, then subtract: 10−4 = 6. Simplify 6/20 to 3/10.",
+        "distractors": [
+          "4/10",
+          "1/-1",
+          "10/3"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 6 hours to min.",
+        "answer": "360 min",
+        "steps": "To convert hours to min, multiply by 60: 6 × 60 = 360 min.",
+        "distractors": [
+          "6 min",
+          "420 min",
+          "36 min"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In the expression 11^5, what is the index (power)?",
+        "answer": "5",
+        "steps": "The index (power) shows how many times the base is multiplied by itself. In 11^5, the index is 5.",
+        "distractors": [
+          "16",
+          "11",
+          "55"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? 11, -0.6, -8, 0.4",
+        "answer": "11",
+        "steps": "Placing all values on a number line from smallest to largest gives: -8, -0.6, 0.4, 11. The largest is 11.",
+        "distractors": [
+          "-0.6",
+          "0.4",
+          "-8"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "What is the value of 3^2?",
+        "answer": "9",
+        "steps": "3^2 means 3 × 3 = 9.",
+        "distractors": [
+          "12",
+          "5",
+          "6"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "What is the next number in the pattern: 2, 7, 12, 17, ...?",
+        "answer": "22",
+        "steps": "Each term increases by 5. Add 5 to the last term 17: 17 + 5 = 22.",
+        "distractors": [
+          "34",
+          "21",
+          "27"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "If a = 4, evaluate 5a + 10.",
+        "answer": "30",
+        "steps": "Substitute a = 4: 5×4 + 10 = 20 + 10 = 30.",
+        "distractors": [
+          "70",
+          "19",
+          "20"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve for x: x + 2 = 5",
+        "answer": "x = 3",
+        "steps": "Subtract 2 from both sides: x = 5 − 2 = 3.",
+        "distractors": [
+          "x = 4",
+          "x = 7",
+          "x = 5"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "If a = 2, evaluate 5a + 4.",
+        "answer": "14",
+        "steps": "Substitute a = 2: 5×2 + 4 = 10 + 4 = 14.",
+        "distractors": [
+          "30",
+          "10",
+          "11"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Solve for x: x + 2 = 9",
+        "answer": "x = 7",
+        "steps": "Subtract 2 from both sides: x = 9 − 2 = 7.",
+        "distractors": [
+          "x = 11",
+          "x = 8",
+          "x = 9"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "If a = 7 and b = 5, evaluate 2a + 3b.",
+        "answer": "29",
+        "steps": "Substitute a = 7 and b = 5: 2×7 + 3×5 = 14 + 15 = 29.",
+        "distractors": [
+          "60",
+          "210",
+          "30"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve for x: x + 5 = 18",
+        "answer": "x = 13",
+        "steps": "Subtract 5 from both sides: x = 18 − 5 = 13.",
+        "distractors": [
+          "x = 23",
+          "x = 15",
+          "x = 18"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 3,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "8/9 + 4/9 = ?",
+        "answer": "4/3",
+        "steps": "Same denominator, so add the numerators: 8 + 4 = 12. Keep the denominator 9: 12/9, which simplifies to 4/3.",
+        "distractors": [
+          "12/18",
+          "5/3",
+          "3/4"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 6% to a decimal.",
+        "answer": "0.06",
+        "steps": "To convert a percentage to a decimal, divide by 100: 6% ÷ 100 = 0.06.",
+        "distractors": [
+          "0.006",
+          "0.6",
+          "60"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "4^3 can be written as:",
+        "answer": "4 × 4 × 4",
+        "steps": "4^3 means 4 multiplied by itself 3 times: 4 × 4 × 4.",
+        "distractors": [
+          "3 × 3 × 3 × 3",
+          "4 × 3",
+          "12"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the smallest number? -0.6, -3/4, 1, -2/5",
+        "answer": "-3/4",
+        "steps": "Placing all values on a number line from smallest to largest gives: -3/4, -0.6, -2/5, 1. The smallest is -3/4.",
+        "distractors": [
+          "-0.6",
+          "-2/5",
+          "1"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "What is the value of 7^2?",
+        "answer": "49",
+        "steps": "7^2 means 7 × 7 = 49.",
+        "distractors": [
+          "14",
+          "56",
+          "9"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 7 and b = 3, evaluate 2a + 3b.",
+        "answer": "23",
+        "steps": "Substitute a = 7 and b = 3: 2×7 + 3×3 = 14 + 9 = 23.",
+        "distractors": [
+          "126",
+          "24",
+          "50"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "What is the next number in the pattern: 3, 5, 7, 9, ...?",
+        "answer": "11",
+        "steps": "Each term increases by 2. Add 2 to the last term 9: 9 + 2 = 11.",
+        "distractors": [
+          "13",
+          "18",
+          "10"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "If a = 3 and b = 3, evaluate 2a + 3b.",
+        "answer": "15",
+        "steps": "Substitute a = 3 and b = 3: 2×3 + 3×3 = 6 + 9 = 15.",
+        "distractors": [
+          "54",
+          "16",
+          "30"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve for x: 3x + 5 = 14",
+        "answer": "x = 3",
+        "steps": "Subtract 5 from both sides: 3x = 9. Divide both sides by 3 to reach x = 3.",
+        "distractors": [
+          "x = 14",
+          "x = 4",
+          "x = 19"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 7, evaluate 3a + 3.",
+        "answer": "24",
+        "steps": "Substitute a = 7: 3×7 + 3 = 21 + 3 = 24.",
+        "distractors": [
+          "21",
+          "13",
+          "30"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Solve for x: 4x + 2 = 30",
+        "answer": "x = 7",
+        "steps": "Subtract 2 from both sides: 4x = 28. Divide both sides by 4 to reach x = 7.",
+        "distractors": [
+          "x = 8",
+          "x = 30",
+          "x = 32"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "If a = 9 and b = 6, evaluate 2a + 3b.",
+        "answer": "36",
+        "steps": "Substitute a = 9 and b = 6: 2×9 + 3×6 = 18 + 18 = 36.",
+        "distractors": [
+          "41",
+          "75",
+          "37"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 3,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "4/8 + 3/5 = ?",
+        "answer": "11/10",
+        "steps": "Find a common denominator: 8 and 5 both divide into 40. Rewrite as 20/40 and 24/40, then add: 20+24 = 44. Simplify 44/40 to 11/10.",
+        "distractors": [
+          "10/11",
+          "12/10",
+          "7/13"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 1/10 to a decimal.",
+        "answer": "0.1",
+        "steps": "Divide the numerator by the denominator: 1 ÷ 10 = 0.1.",
+        "distractors": [
+          "0.1111111111111111",
+          "1.0",
+          "0.01"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 12 hours to min.",
+        "answer": "720 min",
+        "steps": "To convert hours to min, multiply by 60: 12 × 60 = 720 min.",
+        "distractors": [
+          "72 min",
+          "12 min",
+          "780 min"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? 6, -7, -1/2, -1/4",
+        "answer": "6",
+        "steps": "Placing all values on a number line from smallest to largest gives: -7, -1/2, -1/4, 6. The largest is 6.",
+        "distractors": [
+          "-1/4",
+          "-7",
+          "-1/2"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "What is the value of 2^2?",
+        "answer": "4",
+        "steps": "2^2 means 2 × 2 = 4.",
+        "distractors": [
+          "3",
+          "6",
+          "5"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Solve for x: x + 2 = 4",
+        "answer": "x = 2",
+        "steps": "Subtract 2 from both sides: x = 4 − 2 = 2.",
+        "distractors": [
+          "x = 3",
+          "x = 4",
+          "x = 6"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Write an expression for 'a number, n, multiplied by 4 and then increased by 5'.",
+        "answer": "4n + 5",
+        "steps": "Multiplying the number n by 4 gives 4n. Increasing this by 5 gives 4n + 5.",
+        "distractors": [
+          "4(n + 5)",
+          "5n + 4",
+          "n + 4 + 5"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve for x: 6x + 8 = 56",
+        "answer": "x = 8",
+        "steps": "Subtract 8 from both sides: 6x = 48. Divide both sides by 6 to reach x = 8.",
+        "distractors": [
+          "x = 9",
+          "x = 64",
+          "x = 56"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "If a = 5 and b = 8, evaluate 2a + 3b.",
+        "answer": "34",
+        "steps": "Substitute a = 5 and b = 8: 2×5 + 3×8 = 10 + 24 = 34.",
+        "distractors": [
+          "65",
+          "35",
+          "240"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Solve for x: x + 8 = 14",
+        "answer": "x = 6",
+        "steps": "Subtract 8 from both sides: x = 14 − 8 = 6.",
+        "distractors": [
+          "x = 2",
+          "x = 22",
+          "x = 14"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "If a = 8 and b = 7, evaluate 2a + 3b.",
+        "answer": "37",
+        "steps": "Substitute a = 8 and b = 7: 2×8 + 3×7 = 16 + 21 = 37.",
+        "distractors": [
+          "42",
+          "38",
+          "75"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve for x: x + 6 = 10",
+        "answer": "x = 4",
+        "steps": "Subtract 6 from both sides: x = 10 − 6 = 4.",
+        "distractors": [
+          "x = 16",
+          "x = 10",
+          "x = 2"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 4,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "5/7 − 1/3 = ?",
+        "answer": "8/21",
+        "steps": "Find a common denominator: 7 and 3 both divide into 21. Rewrite as 15/21 and 7/21, then subtract: 15−7 = 8. Simplify 8/21 to 8/21.",
+        "distractors": [
+          "4/4",
+          "21/8",
+          "9/21"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 1/4 to a decimal.",
+        "answer": "0.25",
+        "steps": "Divide the numerator by the denominator: 1 ÷ 4 = 0.25.",
+        "distractors": [
+          "2.5",
+          "0.3333333333333333",
+          "0.025"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 20000 m to km.",
+        "answer": "20 km",
+        "steps": "To convert m to km, divide by 1000: 20000 ÷ 1000 = 20 km.",
+        "distractors": [
+          "20000 km",
+          "21 km",
+          "200 km"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "In 7^4, what are the base and index (power)?",
+        "answer": "base = 7, index = 4",
+        "steps": "The base is the number being multiplied (7). The index (power) shows how many times it's multiplied by itself (4).",
+        "distractors": [
+          "base = 7, index = 7",
+          "base = 4, index = 7",
+          "base = 4, index = 4"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "7^2 = ?",
+        "answer": "49",
+        "steps": "7^2 means 7 × 7 = 49.",
+        "distractors": [
+          "9",
+          "56",
+          "14"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 8, evaluate 4a + 5.",
+        "answer": "37",
+        "steps": "Substitute a = 8: 4×8 + 5 = 32 + 5 = 37.",
+        "distractors": [
+          "17",
+          "52",
+          "32"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Solve for x: 6x + 3 = 63",
+        "answer": "x = 10",
+        "steps": "Subtract 3 from both sides: 6x = 60. Divide both sides by 6 to reach x = 10.",
+        "distractors": [
+          "x = 63",
+          "x = 66",
+          "x = 11"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "If a = 6 and b = 2, evaluate 2a + 3b.",
+        "answer": "18",
+        "steps": "Substitute a = 6 and b = 2: 2×6 + 3×2 = 12 + 6 = 18.",
+        "distractors": [
+          "72",
+          "40",
+          "19"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve for x: 4x + 5 = 25",
+        "answer": "x = 5",
+        "steps": "Subtract 5 from both sides: 4x = 20. Divide both sides by 4 to reach x = 5.",
+        "distractors": [
+          "x = 6",
+          "x = 25",
+          "x = 30"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 4 and b = 2, evaluate 2a + 3b.",
+        "answer": "14",
+        "steps": "Substitute a = 4 and b = 2: 2×4 + 3×2 = 8 + 6 = 14.",
+        "distractors": [
+          "48",
+          "30",
+          "15"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Solve for x: x + 5 = 19",
+        "answer": "x = 14",
+        "steps": "Subtract 5 from both sides: x = 19 − 5 = 14.",
+        "distractors": [
+          "x = 19",
+          "x = 24",
+          "x = 16"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "If a = 5, evaluate 5a + 9.",
+        "answer": "34",
+        "steps": "Substitute a = 5: 5×5 + 9 = 25 + 9 = 34.",
+        "distractors": [
+          "19",
+          "25",
+          "70"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 4,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "3/6 − 1/6 = ?",
+        "answer": "1/3",
+        "steps": "Same denominator, so subtract the numerators: 3 − 1 = 2. Keep the denominator 6: 2/6, which simplifies to 1/3.",
+        "distractors": [
+          "2/6",
+          "2/3",
+          "3"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 0.9 to a percentage.",
+        "answer": "90%",
+        "steps": "To convert a decimal to a percentage, multiply by 100: 0.9 × 100 = 90%.",
+        "distractors": [
+          "100%",
+          "0.09%",
+          "9%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 8 km to m.",
+        "answer": "8000 m",
+        "steps": "To convert km to m, multiply by 1000: 8 × 1000 = 8000 m.",
+        "distractors": [
+          "800 m",
+          "9000 m",
+          "8 m"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "7^3 can be written as:",
+        "answer": "7 × 7 × 7",
+        "steps": "7^3 means 7 multiplied by itself 3 times: 7 × 7 × 7.",
+        "distractors": [
+          "8 × 7 × 7",
+          "21",
+          "7 × 3"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Which of the following is the largest number? 1.5, -7, 0.4, 11",
+        "answer": "11",
+        "steps": "Placing all values on a number line from smallest to largest gives: -7, 0.4, 1.5, 11. The largest is 11.",
+        "distractors": [
+          "0.4",
+          "-7",
+          "1.5"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Solve for x: x + 7 = 10",
+        "answer": "x = 3",
+        "steps": "Subtract 7 from both sides: x = 10 − 7 = 3.",
+        "distractors": [
+          "x = 4",
+          "x = 10",
+          "x = 17"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "If a = 6 and b = 4, evaluate 2a + 3b.",
+        "answer": "24",
+        "steps": "Substitute a = 6 and b = 4: 2×6 + 3×4 = 12 + 12 = 24.",
+        "distractors": [
+          "144",
+          "50",
+          "25"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve for x: 6x + 5 = 53",
+        "answer": "x = 8",
+        "steps": "Subtract 5 from both sides: 6x = 48. Divide both sides by 6 to reach x = 8.",
+        "distractors": [
+          "x = 9",
+          "x = 53",
+          "x = 58"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "If a = 6, evaluate 5a + 10.",
+        "answer": "40",
+        "steps": "Substitute a = 6: 5×6 + 10 = 30 + 10 = 40.",
+        "distractors": [
+          "30",
+          "21",
+          "80"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "What is the next number in the pattern: 1, 7, 13, 19, ...?",
+        "answer": "25",
+        "steps": "Each term increases by 6. Add 6 to the last term 19: 19 + 6 = 25.",
+        "distractors": [
+          "38",
+          "31",
+          "24"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "If a = 6, evaluate 2a + 3.",
+        "answer": "15",
+        "steps": "Substitute a = 6: 2×6 + 3 = 12 + 3 = 15.",
+        "distractors": [
+          "12",
+          "18",
+          "11"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve for x: x + 4 = 9",
+        "answer": "x = 5",
+        "steps": "Subtract 4 from both sides: x = 9 − 4 = 5.",
+        "distractors": [
+          "x = 13",
+          "x = 7",
+          "x = 9"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 4,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "Convert 3/5 to a decimal.",
+        "answer": "0.6",
+        "steps": "Divide the numerator by the denominator: 3 ÷ 5 = 0.6.",
+        "distractors": [
+          "6.0",
+          "0.06",
+          "0.75"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 200 cm to m.",
+        "answer": "2 m",
+        "steps": "To convert cm to m, divide by 100: 200 ÷ 100 = 2 m.",
+        "distractors": [
+          "3 m",
+          "200 m",
+          "20 m"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In the expression 5^2, what is the index (power)?",
+        "answer": "2",
+        "steps": "The index (power) shows how many times the base is multiplied by itself. In 5^2, the index is 2.",
+        "distractors": [
+          "5",
+          "10",
+          "7"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? 0.4, 4, 2/3, 1/8",
+        "answer": "4",
+        "steps": "Placing all values on a number line from smallest to largest gives: 1/8, 0.4, 2/3, 4. The largest is 4.",
+        "distractors": [
+          "1/8",
+          "0.4",
+          "2/3"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Calculate 11^3.",
+        "answer": "1331",
+        "steps": "11^3 means 11 × 11 × 11 = 1331.",
+        "distractors": [
+          "33",
+          "14",
+          "1342"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 2 and b = 2, evaluate 2a + 3b.",
+        "answer": "10",
+        "steps": "Substitute a = 2 and b = 2: 2×2 + 3×2 = 4 + 6 = 10.",
+        "distractors": [
+          "11",
+          "20",
+          "24"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Solve for x: x + 3 = 16",
+        "answer": "x = 13",
+        "steps": "Subtract 3 from both sides: x = 16 − 3 = 13.",
+        "distractors": [
+          "x = 16",
+          "x = 19",
+          "x = 15"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "If a = 7 and b = 8, evaluate 2a + 3b.",
+        "answer": "38",
+        "steps": "Substitute a = 7 and b = 8: 2×7 + 3×8 = 14 + 24 = 38.",
+        "distractors": [
+          "43",
+          "39",
+          "75"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve for x: x + 4 = 11",
+        "answer": "x = 7",
+        "steps": "Subtract 4 from both sides: x = 11 − 4 = 7.",
+        "distractors": [
+          "x = 11",
+          "x = 9",
+          "x = 15"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 6, evaluate 5a + 2.",
+        "answer": "32",
+        "steps": "Substitute a = 6: 5×6 + 2 = 30 + 2 = 32.",
+        "distractors": [
+          "30",
+          "40",
+          "13"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "What is the next number in the pattern: 2, 5, 8, 11, ...?",
+        "answer": "14",
+        "steps": "Each term increases by 3. Add 3 to the last term 11: 11 + 3 = 14.",
+        "distractors": [
+          "13",
+          "17",
+          "22"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "If a = 8 and b = 4, evaluate 2a + 3b.",
+        "answer": "28",
+        "steps": "Substitute a = 8 and b = 4: 2×8 + 3×4 = 16 + 12 = 28.",
+        "distractors": [
+          "192",
+          "60",
+          "29"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 5,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "2/3 − 1/3 = ?",
+        "answer": "1/3",
+        "steps": "Same denominator, so subtract the numerators: 2 − 1 = 1. Keep the denominator 3: 1/3, which simplifies to 1/3.",
+        "distractors": [
+          "0/3",
+          "3",
+          "2/3"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 4380 days to years.",
+        "answer": "12 years",
+        "steps": "To convert days to years, divide by 365: 4380 ÷ 365 = 12 years.",
+        "distractors": [
+          "4380 years",
+          "13 years",
+          "120 years"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In the expression 9^3, what is the base?",
+        "answer": "9",
+        "steps": "The base is the number being multiplied by itself. In 9^3, the base is 9.",
+        "distractors": [
+          "3",
+          "12",
+          "27"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the smallest number? 1, -0.5, -2, 9",
+        "answer": "-2",
+        "steps": "Placing all values on a number line from smallest to largest gives: -2, -0.5, 1, 9. The smallest is -2.",
+        "distractors": [
+          "-0.5",
+          "9",
+          "1"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "13^3 = ?",
+        "answer": "2197",
+        "steps": "13^3 means 13 × 13 × 13 = 2197.",
+        "distractors": [
+          "39",
+          "2210",
+          "16"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Solve for x: 6x + 7 = 37",
+        "answer": "x = 5",
+        "steps": "Subtract 7 from both sides: 6x = 30. Divide both sides by 6 to reach x = 5.",
+        "distractors": [
+          "x = 6",
+          "x = 44",
+          "x = 37"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Find the perimeter of a rectangle with length 7 cm and width 3 cm.",
+        "answer": "20 cm",
+        "steps": "Perimeter of a rectangle = 2 × (length + width) = 2 × (7+3) = 20 cm.",
+        "distractors": [
+          "22 cm",
+          "21 cm",
+          "10 cm"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "If a = 5 and b = 5, evaluate 2a + 3b.",
+        "answer": "25",
+        "steps": "Substitute a = 5 and b = 5: 2×5 + 3×5 = 10 + 15 = 25.",
+        "distractors": [
+          "150",
+          "50",
+          "26"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve for x: x + 2 = 15",
+        "answer": "x = 13",
+        "steps": "Subtract 2 from both sides: x = 15 − 2 = 13.",
+        "distractors": [
+          "x = 17",
+          "x = 14",
+          "x = 15"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Find the area of a rectangle with length 10 cm and width 6 cm.",
+        "answer": "60 cm²",
+        "steps": "Area of a rectangle = length × width = 10 × 6 = 60 cm².",
+        "distractors": [
+          "62 cm²",
+          "16 cm²",
+          "32 cm²"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "If a = 4 and b = 6, evaluate 2a + 3b.",
+        "answer": "26",
+        "steps": "Substitute a = 4 and b = 6: 2×4 + 3×6 = 8 + 18 = 26.",
+        "distractors": [
+          "144",
+          "50",
+          "27"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve for x: x + 10 = 17",
+        "answer": "x = 7",
+        "steps": "Subtract 10 from both sides: x = 17 − 10 = 7.",
+        "distractors": [
+          "x = 17",
+          "x = 27",
+          "x = 3"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 5,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "1/2 × 2/8 = ?",
+        "answer": "1/8",
+        "steps": "Multiply the numerators together and the denominators together: (1×2)/(2×8) = 2/16, which simplifies to 1/8.",
+        "distractors": [
+          "2/8",
+          "2/10",
+          "8"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 0.05 to a percentage.",
+        "answer": "5%",
+        "steps": "To convert a decimal to a percentage, multiply by 100: 0.05 × 100 = 5%.",
+        "distractors": [
+          "0.5%",
+          "15%",
+          "0.005%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In the expression 11^3, what is the index (power)?",
+        "answer": "3",
+        "steps": "The index (power) shows how many times the base is multiplied by itself. In 11^3, the index is 3.",
+        "distractors": [
+          "33",
+          "11",
+          "14"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? -10, 0.1, -1, 0.6",
+        "answer": "0.6",
+        "steps": "Placing all values on a number line from smallest to largest gives: -10, -1, 0.1, 0.6. The largest is 0.6.",
+        "distractors": [
+          "0.1",
+          "-10",
+          "-1"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "What is the value of 17^2?",
+        "answer": "289",
+        "steps": "17^2 means 17 × 17 = 289.",
+        "distractors": [
+          "34",
+          "19",
+          "306"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Find the area of a square with side length 8 cm.",
+        "answer": "64 cm²",
+        "steps": "Area of a square = side × side = 8 × 8 = 64 cm².",
+        "distractors": [
+          "16 cm²",
+          "32 cm²",
+          "72 cm²"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "If a = 3 and b = 5, evaluate 2a + 3b.",
+        "answer": "21",
+        "steps": "Substitute a = 3 and b = 5: 2×3 + 3×5 = 6 + 15 = 21.",
+        "distractors": [
+          "40",
+          "90",
+          "22"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve for x: 4x + 7 = 43",
+        "answer": "x = 9",
+        "steps": "Subtract 7 from both sides: 4x = 36. Divide both sides by 4 to reach x = 9.",
+        "distractors": [
+          "x = 50",
+          "x = 10",
+          "x = 43"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Find the area of a triangle with base 11 cm and height 8 cm.",
+        "answer": "44 cm²",
+        "steps": "Area of a triangle = (base × height) ÷ 2 = (11 × 8) ÷ 2 = 44 cm².",
+        "distractors": [
+          "88 cm²",
+          "19 cm²",
+          "46 cm²"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 2 and b = 5, evaluate 2a + 3b.",
+        "answer": "19",
+        "steps": "Substitute a = 2 and b = 5: 2×2 + 3×5 = 4 + 15 = 19.",
+        "distractors": [
+          "35",
+          "20",
+          "60"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Solve for x: 4x + 5 = 21",
+        "answer": "x = 4",
+        "steps": "Subtract 5 from both sides: 4x = 16. Divide both sides by 4 to reach x = 4.",
+        "distractors": [
+          "x = 21",
+          "x = 5",
+          "x = 26"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the area of a triangle with base 7 cm and height 6 cm.",
+        "answer": "21 cm²",
+        "steps": "Area of a triangle = (base × height) ÷ 2 = (7 × 6) ÷ 2 = 21 cm².",
+        "distractors": [
+          "13 cm²",
+          "42 cm²",
+          "23 cm²"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 5,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "2/7 + 3/7 = ?",
+        "answer": "5/7",
+        "steps": "Same denominator, so add the numerators: 2 + 3 = 5. Keep the denominator 7: 5/7, which simplifies to 5/7.",
+        "distractors": [
+          "7/5",
+          "5/14",
+          "6/7"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 3/10 to a percentage.",
+        "answer": "30%",
+        "steps": "Divide the numerator by the denominator, then multiply by 100: (3÷10)×100 = 30%.",
+        "distractors": [
+          "70%",
+          "300%",
+          "3%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 3000 m to km.",
+        "answer": "3 km",
+        "steps": "To convert m to km, divide by 1000: 3000 ÷ 1000 = 3 km.",
+        "distractors": [
+          "30 km",
+          "4 km",
+          "3000 km"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the smallest number? 10, -4, -9, 3/4",
+        "answer": "-9",
+        "steps": "Placing all values on a number line from smallest to largest gives: -9, -4, 3/4, 10. The smallest is -9.",
+        "distractors": [
+          "-4",
+          "10",
+          "3/4"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "4^2 = ?",
+        "answer": "16",
+        "steps": "4^2 means 4 × 4 = 16.",
+        "distractors": [
+          "8",
+          "6",
+          "20"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 4, evaluate 2a + 4.",
+        "answer": "12",
+        "steps": "Substitute a = 4: 2×4 + 4 = 8 + 4 = 12.",
+        "distractors": [
+          "16",
+          "10",
+          "8"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "What is the next number in the pattern: 5, 7, 9, 11, ...?",
+        "answer": "13",
+        "steps": "Each term increases by 2. Add 2 to the last term 11: 11 + 2 = 13.",
+        "distractors": [
+          "15",
+          "22",
+          "12"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Find the area of a rectangle with length 10 cm and width 3 cm.",
+        "answer": "30 cm²",
+        "steps": "Area of a rectangle = length × width = 10 × 3 = 30 cm².",
+        "distractors": [
+          "13 cm²",
+          "32 cm²",
+          "26 cm²"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "If a = 3, evaluate 3a + 10.",
+        "answer": "19",
+        "steps": "Substitute a = 3: 3×3 + 10 = 9 + 10 = 19.",
+        "distractors": [
+          "9",
+          "16",
+          "39"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "What is the next number in the pattern: 5, 9, 13, 17, ...?",
+        "answer": "21",
+        "steps": "Each term increases by 4. Add 4 to the last term 17: 17 + 4 = 21.",
+        "distractors": [
+          "34",
+          "20",
+          "25"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Find the area of a rectangle with length 12 cm and width 2 cm.",
+        "answer": "24 cm²",
+        "steps": "Area of a rectangle = length × width = 12 × 2 = 24 cm².",
+        "distractors": [
+          "26 cm²",
+          "28 cm²",
+          "14 cm²"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "If a = 3, evaluate 2a + 10.",
+        "answer": "16",
+        "steps": "Substitute a = 3: 2×3 + 10 = 6 + 10 = 16.",
+        "distractors": [
+          "6",
+          "26",
+          "15"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 6,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "4/6 + 1/6 = ?",
+        "answer": "5/6",
+        "steps": "Same denominator, so add the numerators: 4 + 1 = 5. Keep the denominator 6: 5/6, which simplifies to 5/6.",
+        "distractors": [
+          "6/5",
+          "6/6",
+          "5/12"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 45% to a decimal.",
+        "answer": "0.45",
+        "steps": "To convert a percentage to a decimal, divide by 100: 45% ÷ 100 = 0.45.",
+        "distractors": [
+          "450",
+          "0.045",
+          "4.5"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 240 hours to days.",
+        "answer": "10 days",
+        "steps": "To convert hours to days, divide by 24: 240 ÷ 24 = 10 days.",
+        "distractors": [
+          "240 days",
+          "100 days",
+          "11 days"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "In the expression 8^4, what is the index (power)?",
+        "answer": "4",
+        "steps": "The index (power) shows how many times the base is multiplied by itself. In 8^4, the index is 4.",
+        "distractors": [
+          "8",
+          "32",
+          "12"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "6^3 = ?",
+        "answer": "216",
+        "steps": "6^3 means 6 × 6 × 6 = 216.",
+        "distractors": [
+          "222",
+          "9",
+          "18"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Solve for x: 3x + 9 = 24",
+        "answer": "x = 5",
+        "steps": "Subtract 9 from both sides: 3x = 15. Divide both sides by 3 to reach x = 5.",
+        "distractors": [
+          "x = 33",
+          "x = 6",
+          "x = 24"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Find the area of a square with side length 12 cm.",
+        "answer": "144 cm²",
+        "steps": "Area of a square = side × side = 12 × 12 = 144 cm².",
+        "distractors": [
+          "48 cm²",
+          "156 cm²",
+          "24 cm²"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "If a = 7 and b = 6, evaluate 2a + 3b.",
+        "answer": "32",
+        "steps": "Substitute a = 7 and b = 6: 2×7 + 3×6 = 14 + 18 = 32.",
+        "distractors": [
+          "33",
+          "252",
+          "65"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve for x: x + 6 = 13",
+        "answer": "x = 7",
+        "steps": "Subtract 6 from both sides: x = 13 − 6 = 7.",
+        "distractors": [
+          "x = 19",
+          "x = 9",
+          "x = 13"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Find the area of a triangle with base 15 cm and height 8 cm.",
+        "answer": "60 cm²",
+        "steps": "Area of a triangle = (base × height) ÷ 2 = (15 × 8) ÷ 2 = 60 cm².",
+        "distractors": [
+          "120 cm²",
+          "23 cm²",
+          "62 cm²"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Write an expression for 'a number, n, multiplied by 6 and then increased by 5'.",
+        "answer": "6n + 5",
+        "steps": "Multiplying the number n by 6 gives 6n. Increasing this by 5 gives 6n + 5.",
+        "distractors": [
+          "5n + 6",
+          "6(n + 5)",
+          "n + 6 + 5"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve for x: x + 5 = 11",
+        "answer": "x = 6",
+        "steps": "Subtract 5 from both sides: x = 11 − 5 = 6.",
+        "distractors": [
+          "x = 8",
+          "x = 11",
+          "x = 16"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 6,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "1/5 × 3/5 = ?",
+        "answer": "3/25",
+        "steps": "Multiply the numerators together and the denominators together: (1×3)/(5×5) = 3/25, which simplifies to 3/25.",
+        "distractors": [
+          "25/3",
+          "3/10",
+          "4/25"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 0.2 to a simplified fraction.",
+        "answer": "1/5",
+        "steps": "Write 0.2 as 2/10 using place value, then simplify to get 1/5.",
+        "distractors": [
+          "5",
+          "20/100",
+          "1/6"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 7 days to hours.",
+        "answer": "168 hours",
+        "steps": "To convert days to hours, multiply by 24: 7 × 24 = 168 hours.",
+        "distractors": [
+          "16.8 hours",
+          "7 hours",
+          "192 hours"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "In the expression 10^5, what is the base?",
+        "answer": "10",
+        "steps": "The base is the number being multiplied by itself. In 10^5, the base is 10.",
+        "distractors": [
+          "15",
+          "50",
+          "5"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Which of the following is the smallest number? 1.5, 0.25, 9, -9",
+        "answer": "-9",
+        "steps": "Placing all values on a number line from smallest to largest gives: -9, 0.25, 1.5, 9. The smallest is -9.",
+        "distractors": [
+          "1.5",
+          "0.25",
+          "9"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Find the perimeter of a rectangle with length 3 cm and width 4 cm.",
+        "answer": "14 cm",
+        "steps": "Perimeter of a rectangle = 2 × (length + width) = 2 × (3+4) = 14 cm.",
+        "distractors": [
+          "7 cm",
+          "16 cm",
+          "12 cm"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "If a = 7 and b = 2, evaluate 2a + 3b.",
+        "answer": "20",
+        "steps": "Substitute a = 7 and b = 2: 2×7 + 3×2 = 14 + 6 = 20.",
+        "distractors": [
+          "45",
+          "21",
+          "84"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve for x: 2x + 10 = 14",
+        "answer": "x = 2",
+        "steps": "Subtract 10 from both sides: 2x = 4. Divide both sides by 2 to reach x = 2.",
+        "distractors": [
+          "x = 14",
+          "x = 3",
+          "x = 24"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Find the area of a square with side length 6 cm.",
+        "answer": "36 cm²",
+        "steps": "Area of a square = side × side = 6 × 6 = 36 cm².",
+        "distractors": [
+          "24 cm²",
+          "12 cm²",
+          "42 cm²"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 9, evaluate 2a + 1.",
+        "answer": "19",
+        "steps": "Substitute a = 9: 2×9 + 1 = 18 + 1 = 19.",
+        "distractors": [
+          "18",
+          "12",
+          "20"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Solve for x: x + 8 = 18",
+        "answer": "x = 10",
+        "steps": "Subtract 8 from both sides: x = 18 − 8 = 10.",
+        "distractors": [
+          "x = 18",
+          "x = 26",
+          "x = 12"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the area of a rectangle with length 5 cm and width 4 cm.",
+        "answer": "20 cm²",
+        "steps": "Area of a rectangle = length × width = 5 × 4 = 20 cm².",
+        "distractors": [
+          "18 cm²",
+          "22 cm²",
+          "9 cm²"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 6,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "Convert 0.6 to a percentage.",
+        "answer": "60%",
+        "steps": "To convert a decimal to a percentage, multiply by 100: 0.6 × 100 = 60%.",
+        "distractors": [
+          "70%",
+          "6%",
+          "0.06%"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 5 km to m.",
+        "answer": "5000 m",
+        "steps": "To convert km to m, multiply by 1000: 5 × 1000 = 5000 m.",
+        "distractors": [
+          "6000 m",
+          "5 m",
+          "500 m"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In the expression 7^4, what is the base?",
+        "answer": "7",
+        "steps": "The base is the number being multiplied by itself. In 7^4, the base is 7.",
+        "distractors": [
+          "11",
+          "4",
+          "28"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? 3/4, 0.25, 1, -1/2",
+        "answer": "1",
+        "steps": "Placing all values on a number line from smallest to largest gives: -1/2, 0.25, 3/4, 1. The largest is 1.",
+        "distractors": [
+          "3/4",
+          "0.25",
+          "-1/2"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "What is the value of 16^2?",
+        "answer": "256",
+        "steps": "16^2 means 16 × 16 = 256.",
+        "distractors": [
+          "272",
+          "18",
+          "32"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 3, evaluate 6a + 3.",
+        "answer": "21",
+        "steps": "Substitute a = 3: 6×3 + 3 = 18 + 3 = 21.",
+        "distractors": [
+          "18",
+          "36",
+          "12"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "What is the next number in the pattern: 3, 9, 15, 21, ...?",
+        "answer": "27",
+        "steps": "Each term increases by 6. Add 6 to the last term 21: 21 + 6 = 27.",
+        "distractors": [
+          "33",
+          "42",
+          "26"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Find the area of a square with side length 2 cm.",
+        "answer": "4 cm²",
+        "steps": "Area of a square = side × side = 2 × 2 = 4 cm².",
+        "distractors": [
+          "5 cm²",
+          "8 cm²",
+          "6 cm²"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "If a = 2, evaluate 4a + 8.",
+        "answer": "16",
+        "steps": "Substitute a = 2: 4×2 + 8 = 8 + 8 = 16.",
+        "distractors": [
+          "8",
+          "14",
+          "40"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Solve for x: 2x + 7 = 27",
+        "answer": "x = 10",
+        "steps": "Subtract 7 from both sides: 2x = 20. Divide both sides by 2 to reach x = 10.",
+        "distractors": [
+          "x = 27",
+          "x = 34",
+          "x = 11"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Find the area of a triangle with base 11 cm and height 3 cm.",
+        "answer": "16.5 cm²",
+        "steps": "Area of a triangle = (base × height) ÷ 2 = (11 × 3) ÷ 2 = 16.5 cm².",
+        "distractors": [
+          "33 cm²",
+          "18.5 cm²",
+          "14 cm²"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "If a = 8, evaluate 3a + 2.",
+        "answer": "26",
+        "steps": "Substitute a = 8: 3×8 + 2 = 24 + 2 = 26.",
+        "distractors": [
+          "30",
+          "13",
+          "24"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 7,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "2/5 + 4/5 = ?",
+        "answer": "6/5",
+        "steps": "Same denominator, so add the numerators: 2 + 4 = 6. Keep the denominator 5: 6/5, which simplifies to 6/5.",
+        "distractors": [
+          "5/6",
+          "6/10",
+          "7/5"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 8 hours to min.",
+        "answer": "480 min",
+        "steps": "To convert hours to min, multiply by 60: 8 × 60 = 480 min.",
+        "distractors": [
+          "540 min",
+          "8 min",
+          "48 min"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In the expression 7^2, what is the index (power)?",
+        "answer": "2",
+        "steps": "The index (power) shows how many times the base is multiplied by itself. In 7^2, the index is 2.",
+        "distractors": [
+          "9",
+          "7",
+          "14"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? -0.25, -0.75, -1/8, -9",
+        "answer": "-1/8",
+        "steps": "Placing all values on a number line from smallest to largest gives: -9, -0.75, -0.25, -1/8. The largest is -1/8.",
+        "distractors": [
+          "-0.25",
+          "-0.75",
+          "-9"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Calculate 20^2.",
+        "answer": "400",
+        "steps": "20^2 means 20 × 20 = 400.",
+        "distractors": [
+          "420",
+          "22",
+          "40"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Find the volume of a rectangular prism with length 8 cm, width 2 cm and height 3 cm.",
+        "answer": "48 cm³",
+        "steps": "Volume of a rectangular prism = length × width × height = 8 × 2 × 3 = 48 cm³.",
+        "distractors": [
+          "26 cm³",
+          "51 cm³",
+          "16 cm³"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "If a = 4, evaluate 5a + 4.",
+        "answer": "24",
+        "steps": "Substitute a = 4: 5×4 + 4 = 20 + 4 = 24.",
+        "distractors": [
+          "13",
+          "40",
+          "20"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "What is the next number in the pattern: 2, 4, 6, 8, ...?",
+        "answer": "10",
+        "steps": "Each term increases by 2. Add 2 to the last term 8: 8 + 2 = 10.",
+        "distractors": [
+          "16",
+          "12",
+          "9"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Find the area of a square with side length 13 cm.",
+        "answer": "169 cm²",
+        "steps": "Area of a square = side × side = 13 × 13 = 169 cm².",
+        "distractors": [
+          "182 cm²",
+          "52 cm²",
+          "26 cm²"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Find the volume of a rectangular prism with length 5 cm, width 3 cm and height 6 cm.",
+        "answer": "90 cm³",
+        "steps": "Volume of a rectangular prism = length × width × height = 5 × 3 × 6 = 90 cm³.",
+        "distractors": [
+          "28 cm³",
+          "15 cm³",
+          "96 cm³"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "If a = 4, evaluate 3a + 2.",
+        "answer": "14",
+        "steps": "Substitute a = 4: 3×4 + 2 = 12 + 2 = 14.",
+        "distractors": [
+          "9",
+          "18",
+          "12"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve for x: x + 8 = 23",
+        "answer": "x = 15",
+        "steps": "Subtract 8 from both sides: x = 23 − 8 = 15.",
+        "distractors": [
+          "x = 23",
+          "x = 17",
+          "x = 31"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 7,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "1/4 + 1/4 = ?",
+        "answer": "1/2",
+        "steps": "Same denominator, so add the numerators: 1 + 1 = 2. Keep the denominator 4: 2/4, which simplifies to 1/2.",
+        "distractors": [
+          "2",
+          "2/8",
+          "2/2"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 1/10 to a percentage.",
+        "answer": "10%",
+        "steps": "Divide the numerator by the denominator, then multiply by 100: (1÷10)×100 = 10%.",
+        "distractors": [
+          "1%",
+          "100%",
+          "90%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In 6^4, what are the base and index (power)?",
+        "answer": "base = 6, index = 4",
+        "steps": "The base is the number being multiplied (6). The index (power) shows how many times it's multiplied by itself (4).",
+        "distractors": [
+          "base = 4, index = 4",
+          "base = 4, index = 6",
+          "base = 6, index = 6"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? 7, 1/5, -0.4, 1",
+        "answer": "7",
+        "steps": "Placing all values on a number line from smallest to largest gives: -0.4, 1/5, 1, 7. The largest is 7.",
+        "distractors": [
+          "-0.4",
+          "1/5",
+          "1"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "3^3 = ?",
+        "answer": "27",
+        "steps": "3^3 means 3 × 3 × 3 = 27.",
+        "distractors": [
+          "30",
+          "6",
+          "9"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 9 and b = 3, evaluate 2a + 3b.",
+        "answer": "27",
+        "steps": "Substitute a = 9 and b = 3: 2×9 + 3×3 = 18 + 9 = 27.",
+        "distractors": [
+          "60",
+          "28",
+          "162"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Solve for x: 5x + 6 = 21",
+        "answer": "x = 3",
+        "steps": "Subtract 6 from both sides: 5x = 15. Divide both sides by 5 to reach x = 3.",
+        "distractors": [
+          "x = 21",
+          "x = 4",
+          "x = 27"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Find the area of a triangle with base 12 cm and height 12 cm.",
+        "answer": "72 cm²",
+        "steps": "Area of a triangle = (base × height) ÷ 2 = (12 × 12) ÷ 2 = 72 cm².",
+        "distractors": [
+          "144 cm²",
+          "74 cm²",
+          "24 cm²"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "A rectangular prism has a volume of 45 cm³, a length of 3 cm and a width of 3 cm. What is its height?",
+        "answer": "5 cm",
+        "steps": "Height = volume ÷ (length × width) = 45 ÷ (3 × 3) = 5 cm.",
+        "distractors": [
+          "4 cm",
+          "6 cm",
+          "45 cm"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 6, evaluate 4a + 1.",
+        "answer": "25",
+        "steps": "Substitute a = 6: 4×6 + 1 = 24 + 1 = 25.",
+        "distractors": [
+          "24",
+          "11",
+          "28"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "What is the next number in the pattern: 5, 10, 15, 20, ...?",
+        "answer": "25",
+        "steps": "Each term increases by 5. Add 5 to the last term 20: 20 + 5 = 25.",
+        "distractors": [
+          "30",
+          "40",
+          "24"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the area of a rectangle with length 7 cm and width 5 cm.",
+        "answer": "35 cm²",
+        "steps": "Area of a rectangle = length × width = 7 × 5 = 35 cm².",
+        "distractors": [
+          "37 cm²",
+          "12 cm²",
+          "24 cm²"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 7,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "5/6 ÷ 1/3 = ?",
+        "answer": "5/2",
+        "steps": "Dividing by a fraction means multiplying by its reciprocal: 5/6 × 3/1 = 15/6, which simplifies to 5/2.",
+        "distractors": [
+          "5/18",
+          "2/5",
+          "6/2"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 60% to a decimal.",
+        "answer": "0.6",
+        "steps": "To convert a percentage to a decimal, divide by 100: 60% ÷ 100 = 0.6.",
+        "distractors": [
+          "6.0",
+          "0.06",
+          "600"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 5 cm to mm.",
+        "answer": "50 mm",
+        "steps": "To convert cm to mm, multiply by 10: 5 × 10 = 50 mm.",
+        "distractors": [
+          "5 mm",
+          "51 mm",
+          "60 mm"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? -3, -1, -7, 0.25",
+        "answer": "0.25",
+        "steps": "Placing all values on a number line from smallest to largest gives: -7, -3, -1, 0.25. The largest is 0.25.",
+        "distractors": [
+          "-7",
+          "-3",
+          "-1"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "17^3 = ?",
+        "answer": "4913",
+        "steps": "17^3 means 17 × 17 × 17 = 4913.",
+        "distractors": [
+          "4930",
+          "20",
+          "51"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Solve for x: 6x + 3 = 51",
+        "answer": "x = 8",
+        "steps": "Subtract 3 from both sides: 6x = 48. Divide both sides by 6 to reach x = 8.",
+        "distractors": [
+          "x = 51",
+          "x = 54",
+          "x = 9"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Find the area of a rectangle with length 5 cm and width 2 cm.",
+        "answer": "10 cm²",
+        "steps": "Area of a rectangle = length × width = 5 × 2 = 10 cm².",
+        "distractors": [
+          "7 cm²",
+          "12 cm²",
+          "14 cm²"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Find the volume of a rectangular prism with length 2 cm, width 6 cm and height 6 cm.",
+        "answer": "72 cm³",
+        "steps": "Volume of a rectangular prism = length × width × height = 2 × 6 × 6 = 72 cm³.",
+        "distractors": [
+          "28 cm³",
+          "78 cm³",
+          "12 cm³"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "If a = 7, evaluate 5a + 9.",
+        "answer": "44",
+        "steps": "Substitute a = 7: 5×7 + 9 = 35 + 9 = 44.",
+        "distractors": [
+          "80",
+          "21",
+          "35"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Solve for x: x + 4 = 7",
+        "answer": "x = 3",
+        "steps": "Subtract 4 from both sides: x = 7 − 4 = 3.",
+        "distractors": [
+          "x = 11",
+          "x = 1",
+          "x = 7"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Find the area of a square with side length 15 cm.",
+        "answer": "225 cm²",
+        "steps": "Area of a square = side × side = 15 × 15 = 225 cm².",
+        "distractors": [
+          "30 cm²",
+          "240 cm²",
+          "60 cm²"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "A rectangular prism has a volume of 36 cm³, a length of 3 cm and a width of 3 cm. What is its height?",
+        "answer": "4 cm",
+        "steps": "Height = volume ÷ (length × width) = 36 ÷ (3 × 3) = 4 cm.",
+        "distractors": [
+          "36 cm",
+          "5 cm",
+          "6 cm"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 8,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "4/7 − 3/7 = ?",
+        "answer": "1/7",
+        "steps": "Same denominator, so subtract the numerators: 4 − 3 = 1. Keep the denominator 7: 1/7, which simplifies to 1/7.",
+        "distractors": [
+          "7",
+          "0/7",
+          "2/7"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 0.08 to a percentage.",
+        "answer": "8%",
+        "steps": "To convert a decimal to a percentage, multiply by 100: 0.08 × 100 = 8%.",
+        "distractors": [
+          "0.008%",
+          "0.8%",
+          "18%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 6 l to ml.",
+        "answer": "6000 ml",
+        "steps": "To convert l to ml, multiply by 1000: 6 × 1000 = 6000 ml.",
+        "distractors": [
+          "6 ml",
+          "600 ml",
+          "7000 ml"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "In 5^4, what are the base and index (power)?",
+        "answer": "base = 5, index = 4",
+        "steps": "The base is the number being multiplied (5). The index (power) shows how many times it's multiplied by itself (4).",
+        "distractors": [
+          "base = 4, index = 4",
+          "base = 4, index = 5",
+          "base = 5, index = 5"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "What is the value of 19^3?",
+        "answer": "6859",
+        "steps": "19^3 means 19 × 19 × 19 = 6859.",
+        "distractors": [
+          "6878",
+          "22",
+          "57"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Find the perimeter of a rectangle with length 5 cm and width 9 cm.",
+        "answer": "28 cm",
+        "steps": "Perimeter of a rectangle = 2 × (length + width) = 2 × (5+9) = 28 cm.",
+        "distractors": [
+          "14 cm",
+          "30 cm",
+          "45 cm"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "A rectangular prism has a volume of 252 cm³, a length of 7 cm and a width of 6 cm. What is its height?",
+        "answer": "6 cm",
+        "steps": "Height = volume ÷ (length × width) = 252 ÷ (7 × 6) = 6 cm.",
+        "distractors": [
+          "13 cm",
+          "252 cm",
+          "7 cm"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "If a = 7, evaluate 5a + 6.",
+        "answer": "41",
+        "steps": "Substitute a = 7: 5×7 + 6 = 35 + 6 = 41.",
+        "distractors": [
+          "65",
+          "35",
+          "18"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve for x: 5x + 10 = 40",
+        "answer": "x = 6",
+        "steps": "Subtract 10 from both sides: 5x = 30. Divide both sides by 5 to reach x = 6.",
+        "distractors": [
+          "x = 50",
+          "x = 7",
+          "x = 40"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Find the perimeter of a rectangle with length 6 cm and width 4 cm.",
+        "answer": "20 cm",
+        "steps": "Perimeter of a rectangle = 2 × (length + width) = 2 × (6+4) = 20 cm.",
+        "distractors": [
+          "10 cm",
+          "22 cm",
+          "24 cm"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "A rectangular prism has a volume of 20 cm³, a length of 5 cm and a width of 2 cm. What is its height?",
+        "answer": "2 cm",
+        "steps": "Height = volume ÷ (length × width) = 20 ÷ (5 × 2) = 2 cm.",
+        "distractors": [
+          "20 cm",
+          "7 cm",
+          "3 cm"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "If a = 8, evaluate 3a + 4.",
+        "answer": "28",
+        "steps": "Substitute a = 8: 3×8 + 4 = 24 + 4 = 28.",
+        "distractors": [
+          "15",
+          "36",
+          "24"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 8,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "7/10 ÷ 4/10 = ?",
+        "answer": "7/4",
+        "steps": "Dividing by a fraction means multiplying by its reciprocal: 7/10 × 10/4 = 70/40, which simplifies to 7/4.",
+        "distractors": [
+          "4/7",
+          "8/4",
+          "7/25"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 9/10 to a decimal.",
+        "answer": "0.9",
+        "steps": "Divide the numerator by the denominator: 9 ÷ 10 = 0.9.",
+        "distractors": [
+          "9.0",
+          "1.0",
+          "0.09"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 4 cm to mm.",
+        "answer": "40 mm",
+        "steps": "To convert cm to mm, multiply by 10: 4 × 10 = 40 mm.",
+        "distractors": [
+          "41 mm",
+          "4 mm",
+          "50 mm"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "In 4^3, what are the base and index (power)?",
+        "answer": "base = 4, index = 3",
+        "steps": "The base is the number being multiplied (4). The index (power) shows how many times it's multiplied by itself (3).",
+        "distractors": [
+          "base = 3, index = 4",
+          "base = 3, index = 3",
+          "base = 4, index = 4"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Which of the following is the smallest number? -1/3, -7, 12, 11",
+        "answer": "-7",
+        "steps": "Placing all values on a number line from smallest to largest gives: -7, -1/3, 11, 12. The smallest is -7.",
+        "distractors": [
+          "11",
+          "12",
+          "-1/3"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "A rectangular prism has a volume of 32 cm³, a length of 4 cm and a width of 4 cm. What is its height?",
+        "answer": "2 cm",
+        "steps": "Height = volume ÷ (length × width) = 32 ÷ (4 × 4) = 2 cm.",
+        "distractors": [
+          "3 cm",
+          "32 cm",
+          "8 cm"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "If a = 9, evaluate 4a + 3.",
+        "answer": "39",
+        "steps": "Substitute a = 9: 4×9 + 3 = 36 + 3 = 39.",
+        "distractors": [
+          "36",
+          "16",
+          "48"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Solve for x: x + 9 = 15",
+        "answer": "x = 6",
+        "steps": "Subtract 9 from both sides: x = 15 − 9 = 6.",
+        "distractors": [
+          "x = 3",
+          "x = 24",
+          "x = 15"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Find the perimeter of a rectangle with length 5 cm and width 4 cm.",
+        "answer": "18 cm",
+        "steps": "Perimeter of a rectangle = 2 × (length + width) = 2 × (5+4) = 18 cm.",
+        "distractors": [
+          "20 cm",
+          "9 cm",
+          "19 cm"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Find the volume of a rectangular prism with length 4 cm, width 6 cm and height 2 cm.",
+        "answer": "48 cm³",
+        "steps": "Volume of a rectangular prism = length × width × height = 4 × 6 × 2 = 48 cm³.",
+        "distractors": [
+          "49 cm³",
+          "50 cm³",
+          "24 cm³"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "If a = 5, evaluate 5a + 2.",
+        "answer": "27",
+        "steps": "Substitute a = 5: 5×5 + 2 = 25 + 2 = 27.",
+        "distractors": [
+          "25",
+          "12",
+          "35"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve for x: 3x + 2 = 29",
+        "answer": "x = 9",
+        "steps": "Subtract 2 from both sides: 3x = 27. Divide both sides by 3 to reach x = 9.",
+        "distractors": [
+          "x = 31",
+          "x = 10",
+          "x = 29"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 8,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "Convert 0.25 to a simplified fraction.",
+        "answer": "1/4",
+        "steps": "Write 0.25 as 25/100 using place value, then simplify to get 1/4.",
+        "distractors": [
+          "25/100",
+          "4",
+          "1/5"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 12 years to days.",
+        "answer": "4380 days",
+        "steps": "To convert years to days, multiply by 365: 12 × 365 = 4380 days.",
+        "distractors": [
+          "4745 days",
+          "438 days",
+          "12 days"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In 3^2, what are the base and index (power)?",
+        "answer": "base = 3, index = 2",
+        "steps": "The base is the number being multiplied (3). The index (power) shows how many times it's multiplied by itself (2).",
+        "distractors": [
+          "base = 2, index = 3",
+          "base = 3, index = 3",
+          "base = 2, index = 2"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? -0.75, -3.5, 1/2, -9",
+        "answer": "1/2",
+        "steps": "Placing all values on a number line from smallest to largest gives: -9, -3.5, -0.75, 1/2. The largest is 1/2.",
+        "distractors": [
+          "-3.5",
+          "-0.75",
+          "-9"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "11^2 = ?",
+        "answer": "121",
+        "steps": "11^2 means 11 × 11 = 121.",
+        "distractors": [
+          "13",
+          "22",
+          "132"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 6, evaluate 4a + 6.",
+        "answer": "30",
+        "steps": "Substitute a = 6: 4×6 + 6 = 24 + 6 = 30.",
+        "distractors": [
+          "48",
+          "16",
+          "24"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Solve for x: x + 10 = 21",
+        "answer": "x = 11",
+        "steps": "Subtract 10 from both sides: x = 21 − 10 = 11.",
+        "distractors": [
+          "x = 21",
+          "x = 31",
+          "x = 13"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Find the perimeter of a rectangle with length 9 cm and width 2 cm.",
+        "answer": "22 cm",
+        "steps": "Perimeter of a rectangle = 2 × (length + width) = 2 × (9+2) = 22 cm.",
+        "distractors": [
+          "18 cm",
+          "24 cm",
+          "11 cm"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "A rectangular prism has a volume of 144 cm³, a length of 8 cm and a width of 3 cm. What is its height?",
+        "answer": "6 cm",
+        "steps": "Height = volume ÷ (length × width) = 144 ÷ (8 × 3) = 6 cm.",
+        "distractors": [
+          "144 cm",
+          "11 cm",
+          "7 cm"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 4 and b = 7, evaluate 2a + 3b.",
+        "answer": "29",
+        "steps": "Substitute a = 4 and b = 7: 2×4 + 3×7 = 8 + 21 = 29.",
+        "distractors": [
+          "55",
+          "30",
+          "168"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "What is the next number in the pattern: 3, 8, 13, 18, ...?",
+        "answer": "23",
+        "steps": "Each term increases by 5. Add 5 to the last term 18: 18 + 5 = 23.",
+        "distractors": [
+          "22",
+          "36",
+          "28"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the area of a square with side length 11 cm.",
+        "answer": "121 cm²",
+        "steps": "Area of a square = side × side = 11 × 11 = 121 cm².",
+        "distractors": [
+          "22 cm²",
+          "132 cm²",
+          "44 cm²"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 9,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "1/4 + 2/4 = ?",
+        "answer": "3/4",
+        "steps": "Same denominator, so add the numerators: 1 + 2 = 3. Keep the denominator 4: 3/4, which simplifies to 3/4.",
+        "distractors": [
+          "4/3",
+          "4/4",
+          "3/8"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 30 mm to cm.",
+        "answer": "3 cm",
+        "steps": "To convert mm to cm, divide by 10: 30 ÷ 10 = 3 cm.",
+        "distractors": [
+          "30 cm",
+          "4 cm",
+          "2 cm"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "6^5 can be written as:",
+        "answer": "6 × 6 × 6 × 6 × 6",
+        "steps": "6^5 means 6 multiplied by itself 5 times: 6 × 6 × 6 × 6 × 6.",
+        "distractors": [
+          "30",
+          "6 × 5",
+          "5 × 5 × 5 × 5 × 5 × 5"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the smallest number? 1/3, 1/4, 12, 1/2",
+        "answer": "1/4",
+        "steps": "Placing all values on a number line from smallest to largest gives: 1/4, 1/3, 1/2, 12. The smallest is 1/4.",
+        "distractors": [
+          "1/3",
+          "12",
+          "1/2"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "What is the value of 10^2?",
+        "answer": "100",
+        "steps": "10^2 means 10 × 10 = 100.",
+        "distractors": [
+          "110",
+          "12",
+          "20"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 6, evaluate 2a + 9.",
+        "answer": "21",
+        "steps": "Substitute a = 6: 2×6 + 9 = 12 + 9 = 21.",
+        "distractors": [
+          "12",
+          "17",
+          "30"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "What is the next number in the pattern: 4, 9, 14, 19, ...?",
+        "answer": "24",
+        "steps": "Each term increases by 5. Add 5 to the last term 19: 19 + 5 = 24.",
+        "distractors": [
+          "29",
+          "38",
+          "23"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Find the area of a rectangle with length 7 cm and width 2 cm.",
+        "answer": "14 cm²",
+        "steps": "Area of a rectangle = length × width = 7 × 2 = 14 cm².",
+        "distractors": [
+          "9 cm²",
+          "18 cm²",
+          "16 cm²"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Find the volume of a rectangular prism with length 2 cm, width 5 cm and height 2 cm.",
+        "answer": "20 cm³",
+        "steps": "Volume of a rectangular prism = length × width × height = 2 × 5 × 2 = 20 cm³.",
+        "distractors": [
+          "18 cm³",
+          "22 cm³",
+          "10 cm³"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Convert 19:45 (24-hour time) into 12-hour time.",
+        "answer": "7:45 pm",
+        "steps": "Subtract 12 from the hour: 19 − 12 = 7. Since it's after midday, the time is 7:45 pm.",
+        "distractors": [
+          "8:45 pm",
+          "7:45 am",
+          "19:45 pm"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "If a = 6 and b = 5, evaluate 2a + 3b.",
+        "answer": "27",
+        "steps": "Substitute a = 6 and b = 5: 2×6 + 3×5 = 12 + 15 = 27.",
+        "distractors": [
+          "55",
+          "180",
+          "28"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve for x: x + 4 = 10",
+        "answer": "x = 6",
+        "steps": "Subtract 4 from both sides: x = 10 − 4 = 6.",
+        "distractors": [
+          "x = 10",
+          "x = 8",
+          "x = 14"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 9,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "5/6 ÷ 1/2 = ?",
+        "answer": "5/3",
+        "steps": "Dividing by a fraction means multiplying by its reciprocal: 5/6 × 2/1 = 10/6, which simplifies to 5/3.",
+        "distractors": [
+          "3/5",
+          "6/3",
+          "5/12"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 1/4 to a percentage.",
+        "answer": "25%",
+        "steps": "Divide the numerator by the denominator, then multiply by 100: (1÷4)×100 = 25%.",
+        "distractors": [
+          "250%",
+          "75%",
+          "2%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In the expression 8^5, what is the index (power)?",
+        "answer": "5",
+        "steps": "The index (power) shows how many times the base is multiplied by itself. In 8^5, the index is 5.",
+        "distractors": [
+          "40",
+          "13",
+          "8"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the smallest number? -1/2, 1/4, -10, 0.6",
+        "answer": "-10",
+        "steps": "Placing all values on a number line from smallest to largest gives: -10, -1/2, 1/4, 0.6. The smallest is -10.",
+        "distractors": [
+          "-1/2",
+          "1/4",
+          "0.6"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "15^2 = ?",
+        "answer": "225",
+        "steps": "15^2 means 15 × 15 = 225.",
+        "distractors": [
+          "30",
+          "17",
+          "240"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "What is the next number in the pattern: 3, 6, 9, 12, ...?",
+        "answer": "15",
+        "steps": "Each term increases by 3. Add 3 to the last term 12: 12 + 3 = 15.",
+        "distractors": [
+          "24",
+          "14",
+          "18"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "Find the area of a triangle with base 11 cm and height 7 cm.",
+        "answer": "38.5 cm²",
+        "steps": "Area of a triangle = (base × height) ÷ 2 = (11 × 7) ÷ 2 = 38.5 cm².",
+        "distractors": [
+          "40.5 cm²",
+          "77 cm²",
+          "18 cm²"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "A rectangular prism has a volume of 75 cm³, a length of 5 cm and a width of 3 cm. What is its height?",
+        "answer": "5 cm",
+        "steps": "Height = volume ÷ (length × width) = 75 ÷ (5 × 3) = 5 cm.",
+        "distractors": [
+          "8 cm",
+          "75 cm",
+          "6 cm"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "When it is 2:00 pm in Perth (AWST), and Sydney (AEST) is 2 hours ahead, what time is it in Sydney?",
+        "answer": "4:00 pm",
+        "steps": "Add 2 hours to the Perth time: 2 + 2 = 4. Adjust for the 12-hour clock to get 4:00 pm.",
+        "distractors": [
+          "3:00 pm",
+          "2:00 pm",
+          "5:00 pm"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "If a = 5, evaluate 6a + 8.",
+        "answer": "38",
+        "steps": "Substitute a = 5: 6×5 + 8 = 30 + 8 = 38.",
+        "distractors": [
+          "30",
+          "19",
+          "78"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Solve for x: x + 3 = 10",
+        "answer": "x = 7",
+        "steps": "Subtract 3 from both sides: x = 10 − 3 = 7.",
+        "distractors": [
+          "x = 9",
+          "x = 13",
+          "x = 10"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the area of a square with side length 5 cm.",
+        "answer": "25 cm²",
+        "steps": "Area of a square = side × side = 5 × 5 = 25 cm².",
+        "distractors": [
+          "20 cm²",
+          "10 cm²",
+          "30 cm²"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 9,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "3/5 + 1/4 = ?",
+        "answer": "17/20",
+        "steps": "Find a common denominator: 5 and 4 both divide into 20. Rewrite as 12/20 and 5/20, then add: 12+5 = 17. Simplify 17/20 to 17/20.",
+        "distractors": [
+          "20/17",
+          "18/20",
+          "4/9"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 0.3 to a simplified fraction.",
+        "answer": "3/10",
+        "steps": "Write 0.3 as 3/10 using place value, then simplify to get 3/10.",
+        "distractors": [
+          "30/100",
+          "10/3",
+          "3/11"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 2000 g to kg.",
+        "answer": "2 kg",
+        "steps": "To convert g to kg, divide by 1000: 2000 ÷ 1000 = 2 kg.",
+        "distractors": [
+          "3 kg",
+          "2000 kg",
+          "20 kg"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? -0.2, 0.75, 0.2, 3/8",
+        "answer": "0.75",
+        "steps": "Placing all values on a number line from smallest to largest gives: -0.2, 0.2, 3/8, 0.75. The largest is 0.75.",
+        "distractors": [
+          "3/8",
+          "-0.2",
+          "0.2"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "20^2 = ?",
+        "answer": "400",
+        "steps": "20^2 means 20 × 20 = 400.",
+        "distractors": [
+          "22",
+          "420",
+          "40"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Find the area of a rectangle with length 7 cm and width 8 cm.",
+        "answer": "56 cm²",
+        "steps": "Area of a rectangle = length × width = 7 × 8 = 56 cm².",
+        "distractors": [
+          "15 cm²",
+          "30 cm²",
+          "58 cm²"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "A rectangular prism has a volume of 80 cm³, a length of 5 cm and a width of 4 cm. What is its height?",
+        "answer": "4 cm",
+        "steps": "Height = volume ÷ (length × width) = 80 ÷ (5 × 4) = 4 cm.",
+        "distractors": [
+          "9 cm",
+          "80 cm",
+          "5 cm"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Convert 15:30 (24-hour time) into 12-hour time.",
+        "answer": "3:30 pm",
+        "steps": "Subtract 12 from the hour: 15 − 12 = 3. Since it's after midday, the time is 3:30 pm.",
+        "distractors": [
+          "4:30 pm",
+          "3:30 am",
+          "15:30 pm"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "If a = 2, evaluate 3a + 3.",
+        "answer": "9",
+        "steps": "Substitute a = 2: 3×2 + 3 = 6 + 3 = 9.",
+        "distractors": [
+          "8",
+          "15",
+          "6"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Solve for x: 3x + 2 = 32",
+        "answer": "x = 10",
+        "steps": "Subtract 2 from both sides: 3x = 30. Divide both sides by 3 to reach x = 10.",
+        "distractors": [
+          "x = 32",
+          "x = 11",
+          "x = 34"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "Find the area of a triangle with base 7 cm and height 9 cm.",
+        "answer": "31.5 cm²",
+        "steps": "Area of a triangle = (base × height) ÷ 2 = (7 × 9) ÷ 2 = 31.5 cm².",
+        "distractors": [
+          "33.5 cm²",
+          "16 cm²",
+          "63 cm²"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Find the volume of a rectangular prism with length 6 cm, width 6 cm and height 5 cm.",
+        "answer": "180 cm³",
+        "steps": "Volume of a rectangular prism = length × width × height = 6 × 6 × 5 = 180 cm³.",
+        "distractors": [
+          "185 cm³",
+          "34 cm³",
+          "36 cm³"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 10,
+    "set": 1,
+    "questions": [
+      {
+        "id": 1,
+        "q": "5/8 − 1/8 = ?",
+        "answer": "1/2",
+        "steps": "Same denominator, so subtract the numerators: 5 − 1 = 4. Keep the denominator 8: 4/8, which simplifies to 1/2.",
+        "distractors": [
+          "4/8",
+          "2/2",
+          "2"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 30% to a simplified fraction.",
+        "answer": "3/10",
+        "steps": "Write the percentage over 100: 30/100, then simplify to get 3/10.",
+        "distractors": [
+          "4/10",
+          "30/100",
+          "10/3"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 3 l to ml.",
+        "answer": "3000 ml",
+        "steps": "To convert l to ml, multiply by 1000: 3 × 1000 = 3000 ml.",
+        "distractors": [
+          "3 ml",
+          "4000 ml",
+          "300 ml"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "In the expression 9^3, what is the index (power)?",
+        "answer": "3",
+        "steps": "The index (power) shows how many times the base is multiplied by itself. In 9^3, the index is 3.",
+        "distractors": [
+          "12",
+          "9",
+          "27"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Calculate 2^2.",
+        "answer": "4",
+        "steps": "2^2 means 2 × 2 = 4.",
+        "distractors": [
+          "3",
+          "5",
+          "6"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "A rectangular prism has a volume of 60 cm³, a length of 6 cm and a width of 5 cm. What is its height?",
+        "answer": "2 cm",
+        "steps": "Height = volume ÷ (length × width) = 60 ÷ (6 × 5) = 2 cm.",
+        "distractors": [
+          "60 cm",
+          "11 cm",
+          "3 cm"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "When it is 11:00 pm in Perth (AWST), and Sydney (AEST) is 2 hours ahead, what time is it in Sydney?",
+        "answer": "1:00 am",
+        "steps": "Add 2 hours to the Perth time: 11 + 2 = 13. Adjust for the 12-hour clock to get 1:00 am.",
+        "distractors": [
+          "2:00 pm",
+          "9:00 pm",
+          "11:00 pm"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "If a = 3 and b = 4, evaluate 2a + 3b.",
+        "answer": "18",
+        "steps": "Substitute a = 3 and b = 4: 2×3 + 3×4 = 6 + 12 = 18.",
+        "distractors": [
+          "72",
+          "35",
+          "19"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Solve for x: x + 10 = 14",
+        "answer": "x = 4",
+        "steps": "Subtract 10 from both sides: x = 14 − 10 = 4.",
+        "distractors": [
+          "x = 6",
+          "x = 14",
+          "x = 24"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Find the area of a rectangle with length 4 cm and width 5 cm.",
+        "answer": "20 cm²",
+        "steps": "Area of a rectangle = length × width = 4 × 5 = 20 cm².",
+        "distractors": [
+          "22 cm²",
+          "9 cm²",
+          "18 cm²"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "A rectangular prism has a volume of 180 cm³, a length of 6 cm and a width of 5 cm. What is its height?",
+        "answer": "6 cm",
+        "steps": "Height = volume ÷ (length × width) = 180 ÷ (6 × 5) = 6 cm.",
+        "distractors": [
+          "11 cm",
+          "180 cm",
+          "7 cm"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "When it is 6:00 pm in Perth (AWST), and Sydney (AEST) is 2 hours ahead, what time is it in Sydney?",
+        "answer": "8:00 pm",
+        "steps": "Add 2 hours to the Perth time: 6 + 2 = 8. Adjust for the 12-hour clock to get 8:00 pm.",
+        "distractors": [
+          "9:00 pm",
+          "6:00 pm",
+          "4:00 pm"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 10,
+    "set": 2,
+    "questions": [
+      {
+        "id": 1,
+        "q": "4/7 − 1/2 = ?",
+        "answer": "1/14",
+        "steps": "Find a common denominator: 7 and 2 both divide into 14. Rewrite as 8/14 and 7/14, then subtract: 8−7 = 1. Simplify 1/14 to 1/14.",
+        "distractors": [
+          "14",
+          "3/5",
+          "2/14"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 0.45 to a percentage.",
+        "answer": "45%",
+        "steps": "To convert a decimal to a percentage, multiply by 100: 0.45 × 100 = 45%.",
+        "distractors": [
+          "4.5%",
+          "55%",
+          "0.045%"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "Convert 2555 days to years.",
+        "answer": "7 years",
+        "steps": "To convert days to years, divide by 365: 2555 ÷ 365 = 7 years.",
+        "distractors": [
+          "70 years",
+          "8 years",
+          "2555 years"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "4^5 can be written as:",
+        "answer": "4 × 4 × 4 × 4 × 4",
+        "steps": "4^5 means 4 multiplied by itself 5 times: 4 × 4 × 4 × 4 × 4.",
+        "distractors": [
+          "5 × 5 × 5 × 5",
+          "4 × 5",
+          "20"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Which of the following is the smallest number? -6, -0.4, 1, 0.5",
+        "answer": "-6",
+        "steps": "Placing all values on a number line from smallest to largest gives: -6, -0.4, 0.5, 1. The smallest is -6.",
+        "distractors": [
+          "-0.4",
+          "1",
+          "0.5"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "Convert 22:15 (24-hour time) into 12-hour time.",
+        "answer": "10:15 pm",
+        "steps": "Subtract 12 from the hour: 22 − 12 = 10. Since it's after midday, the time is 10:15 pm.",
+        "distractors": [
+          "11:15 pm",
+          "10:15 am",
+          "22:15 pm"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "If a = 7, evaluate 2a + 5.",
+        "answer": "19",
+        "steps": "Substitute a = 7: 2×7 + 5 = 14 + 5 = 19.",
+        "distractors": [
+          "14",
+          "20",
+          "24"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "What is the next number in the pattern: 2, 8, 14, 20, ...?",
+        "answer": "26",
+        "steps": "Each term increases by 6. Add 6 to the last term 20: 20 + 6 = 26.",
+        "distractors": [
+          "25",
+          "32",
+          "40"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "Find the perimeter of a rectangle with length 8 cm and width 5 cm.",
+        "answer": "26 cm",
+        "steps": "Perimeter of a rectangle = 2 × (length + width) = 2 × (8+5) = 26 cm.",
+        "distractors": [
+          "40 cm",
+          "13 cm",
+          "28 cm"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "A rectangular prism has a volume of 147 cm³, a length of 7 cm and a width of 7 cm. What is its height?",
+        "answer": "3 cm",
+        "steps": "Height = volume ÷ (length × width) = 147 ÷ (7 × 7) = 3 cm.",
+        "distractors": [
+          "14 cm",
+          "147 cm",
+          "4 cm"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "When it is 4:00 pm in Perth (AWST), and Sydney (AEST) is 3 hours ahead, what time is it in Sydney?",
+        "answer": "7:00 pm",
+        "steps": "Add 3 hours to the Perth time: 4 + 3 = 7. Adjust for the 12-hour clock to get 7:00 pm.",
+        "distractors": [
+          "4:00 pm",
+          "8:00 pm",
+          "1:00 pm"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "If a = 9, evaluate 6a + 9.",
+        "answer": "63",
+        "steps": "Substitute a = 9: 6×9 + 9 = 54 + 9 = 63.",
+        "distractors": [
+          "24",
+          "108",
+          "54"
+        ]
+      }
+    ]
+  },
+  {
+    "week": 10,
+    "set": 3,
+    "questions": [
+      {
+        "id": 1,
+        "q": "Convert 40% to a simplified fraction.",
+        "answer": "2/5",
+        "steps": "Write the percentage over 100: 40/100, then simplify to get 2/5.",
+        "distractors": [
+          "40/100",
+          "3/5",
+          "5/2"
+        ]
+      },
+      {
+        "id": 2,
+        "q": "Convert 12 cm to mm.",
+        "answer": "120 mm",
+        "steps": "To convert cm to mm, multiply by 10: 12 × 10 = 120 mm.",
+        "distractors": [
+          "12 mm",
+          "121 mm",
+          "130 mm"
+        ]
+      },
+      {
+        "id": 3,
+        "q": "In 8^2, what are the base and index (power)?",
+        "answer": "base = 8, index = 2",
+        "steps": "The base is the number being multiplied (8). The index (power) shows how many times it's multiplied by itself (2).",
+        "distractors": [
+          "base = 8, index = 8",
+          "base = 2, index = 8",
+          "base = 2, index = 2"
+        ]
+      },
+      {
+        "id": 4,
+        "q": "Which of the following is the largest number? -0.75, -4/5, 2/3, -1.5",
+        "answer": "2/3",
+        "steps": "Placing all values on a number line from smallest to largest gives: -1.5, -4/5, -0.75, 2/3. The largest is 2/3.",
+        "distractors": [
+          "-1.5",
+          "-4/5",
+          "-0.75"
+        ]
+      },
+      {
+        "id": 5,
+        "q": "Calculate 8^3.",
+        "answer": "512",
+        "steps": "8^3 means 8 × 8 × 8 = 512.",
+        "distractors": [
+          "11",
+          "24",
+          "520"
+        ]
+      },
+      {
+        "id": 6,
+        "q": "If a = 7, evaluate 6a + 10.",
+        "answer": "52",
+        "steps": "Substitute a = 7: 6×7 + 10 = 42 + 10 = 52.",
+        "distractors": [
+          "42",
+          "23",
+          "102"
+        ]
+      },
+      {
+        "id": 7,
+        "q": "What is the next number in the pattern: 4, 6, 8, 10, ...?",
+        "answer": "12",
+        "steps": "Each term increases by 2. Add 2 to the last term 10: 10 + 2 = 12.",
+        "distractors": [
+          "11",
+          "14",
+          "20"
+        ]
+      },
+      {
+        "id": 8,
+        "q": "Find the perimeter of a rectangle with length 7 cm and width 8 cm.",
+        "answer": "30 cm",
+        "steps": "Perimeter of a rectangle = 2 × (length + width) = 2 × (7+8) = 30 cm.",
+        "distractors": [
+          "15 cm",
+          "56 cm",
+          "32 cm"
+        ]
+      },
+      {
+        "id": 9,
+        "q": "A rectangular prism has a volume of 150 cm³, a length of 6 cm and a width of 5 cm. What is its height?",
+        "answer": "5 cm",
+        "steps": "Height = volume ÷ (length × width) = 150 ÷ (6 × 5) = 5 cm.",
+        "distractors": [
+          "11 cm",
+          "150 cm",
+          "6 cm"
+        ]
+      },
+      {
+        "id": 10,
+        "q": "Convert 17:00 (24-hour time) into 12-hour time.",
+        "answer": "5:00 pm",
+        "steps": "Subtract 12 from the hour: 17 − 12 = 5. Since it's after midday, the time is 5:00 pm.",
+        "distractors": [
+          "6:00 pm",
+          "5:00 am",
+          "17:00 pm"
+        ]
+      },
+      {
+        "id": 11,
+        "q": "If a = 3, evaluate 3a + 1.",
+        "answer": "10",
+        "steps": "Substitute a = 3: 3×3 + 1 = 9 + 1 = 10.",
+        "distractors": [
+          "7",
+          "12",
+          "9"
+        ]
+      },
+      {
+        "id": 12,
+        "q": "Solve for x: x + 8 = 10",
+        "answer": "x = 2",
+        "steps": "Subtract 8 from both sides: x = 10 − 8 = 2.",
+        "distractors": [
+          "x = 18",
+          "x = 6",
+          "x = 10"
+        ]
+      }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// SET SELECTION
+// ═══════════════════════════════════════════════════════════
+let selectedWeek = 1;
+let selectedSet  = 1;
+
+function updateSetOptions() {
+  const week = parseInt(document.getElementById('weekSelect').value);
+  const setSelect = document.getElementById('setSelect');
+  // Week 1 only has sets 1,2,3 but set 1 is always available
+  // All weeks have sets 1,2,3
+  setSelect.innerHTML = '';
+  const maxSet = 3;
+  const minSet = (week === 1) ? 1 : 1;
+  for(let s = minSet; s <= maxSet; s++) {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = `Set ${s}`;
+    setSelect.appendChild(opt);
+  }
+  updateSelectedSet();
+}
+
+function updateSelectedSet() {
+  selectedWeek = parseInt(document.getElementById('weekSelect').value);
+  selectedSet  = parseInt(document.getElementById('setSelect').value);
+  const label = `Week ${selectedWeek} · Set ${selectedSet}`;
+  document.getElementById('selectedSetLabel').textContent = label;
+  document.getElementById('homeSubtitle').textContent = `Week ${selectedWeek} Lesson ${selectedSet}, Term 3, 2026`;
+}
+
+function getActiveQuestions() {
+  // Week 1 Set 1 = the hardcoded ALL_QUESTIONS
+  if(selectedWeek === 1 && selectedSet === 1) return ALL_QUESTIONS;
+  // Otherwise find in ALL_SETS
+  const found = ALL_SETS.find(s => s.week === selectedWeek && s.set === selectedSet);
+  if(!found) return ALL_QUESTIONS;
+  // Map to same format as ALL_QUESTIONS
+  return found.questions.map((q, i) => ({
+    id: i+1,
+    q: q.q,
+    answer: q.answer,
+    steps: q.steps,
+    distractors: q.distractors
+  }));
+}
+
+// Initialise on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateSetOptions();
+});
+
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let currentMode = '';
+let currentDiff = 'easy';
+let timerEnabled = true;
+let score = 0;
+let combo = 0;
+let qIndex = 0;
+let qList  = [];
+let timer  = null;
+let timerTick = null;
+let timeLeft = 0;
+let totalTime = 0;
+let correctCount = 0;
+let wrongCount   = 0;
+let chainStreak  = 0;
+let bestStreak   = 0;
+let matchSelected = null;
+let matchMatched  = 0;
+const TOTAL_Q = 12;
+const Q_TIME_BLITZ = 40;
+const Q_TIME_FILL  = 50;
+
+// ═══════════════════════════════════════════════════════════
+// TEACHER TIMER TOGGLE
+// ═══════════════════════════════════════════════════════════
+function toggleTimer() {
+  timerEnabled = !timerEnabled;
+  const btn = document.getElementById('timerToggleBtn');
+  if(timerEnabled){
+    btn.textContent='⏱ Timer: ON';
+    btn.style.background='rgba(0,212,170,0.15)';
+    btn.style.borderColor='var(--teal)';
+    btn.style.color='var(--teal)';
+  } else {
+    btn.textContent='⏱ Timer: OFF';
+    btn.style.background='rgba(248,113,113,0.15)';
+    btn.style.borderColor='var(--red)';
+    btn.style.color='var(--red)';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════════════════════════
+function initParticles() {
+  const wrap = document.getElementById('particles');
+  wrap.innerHTML = '';
+  const colours = ['#00d4aa','#ff6b9d','#ffd93d','#a855f7','#38bdf8','#fb923c','#4ade80'];
+  for(let i=0;i<22;i++){
+    const el = document.createElement('div');
+    el.className = 'particle';
+    const sz = 4 + Math.random()*10;
+    el.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:-${sz}px;background:${colours[Math.floor(Math.random()*colours.length)]};animation-duration:${8+Math.random()*14}s;animation-delay:${-Math.random()*14}s;`;
+    wrap.appendChild(el);
+  }
+}
+initParticles();
+
+// ═══════════════════════════════════════════════════════════
+// SCREEN NAV
+// ═══════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const backBtn = document.getElementById('backBtn');
+  backBtn.classList.toggle('visible', id!=='home' && id!=='results');
+}
+
+function goHome() {
+  clearInterval(timer);
+  clearInterval(timerTick);
+  showScreen('home');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODE LAUNCH — no difficulty screen, straight into game
+// ═══════════════════════════════════════════════════════════
+function launchDirect(mode) {
+  currentMode = mode;
+  currentDiff = 'easy';
+  if(mode==='blitz') startBlitz();
+  else if(mode==='match') startMatch();
+  else if(mode==='fill')  startFill();
+  else if(mode==='chain') startChain();
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILITY
+// ═══════════════════════════════════════════════════════════
+function shuffle(a) {
+  const b=[...a];
+  for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
+  return b;
+}
+
+function pick(n, arr) { return shuffle(arr).slice(0,n); }
+
+function spawnPoints(pts, color='#ffd93d') {
+  const el = document.createElement('div');
+  el.className='points-pop';
+  el.style.cssText=`color:${color};top:${window.innerHeight/2-60}px;left:${window.innerWidth/2-20}px`;
+  el.textContent=(pts>0?'+':'')+pts+' pts';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1300);
+}
+
+function updateCombo(n) {
+  combo = n;
+  const badge = document.getElementById('comboBadge');
+  if(combo>=2){
+    document.getElementById('comboCount').textContent=combo;
+    badge.classList.add('show');
+    setTimeout(()=>badge.classList.remove('show'),1600);
+  }
+}
+
+function buildDots(n, active) {
+  const wrap = document.getElementById('progressDots');
+  wrap.innerHTML='';
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i===active?' current':'');
+    d.id=`dot-${i}`;
+    wrap.appendChild(d);
+  }
+}
+
+function markDot(i, correct) {
+  const d=document.getElementById(`dot-${i}`);
+  if(d) d.className='dot '+(correct?'done-correct':'done-wrong');
+}
+
+function nextDot(i) {
+  const d=document.getElementById(`dot-${i}`);
+  if(d) d.className='dot current';
+}
+
+function applyTimerUI() {
+  const wrap = document.getElementById('timerBarWrap');
+  const pill = document.getElementById('timerSecsPill');
+  if(wrap) wrap.style.display = timerEnabled ? 'flex' : 'none';
+  if(pill) pill.style.display = timerEnabled ? 'flex' : 'none';
+}
+
+function startTimerBar(secs, barId, cb) {
+  clearInterval(timer);
+  clearInterval(timerTick);
+  timeLeft = secs;
+  totalTime = secs;
+  const bar   = document.getElementById(barId);
+  const secEl = document.getElementById('timerSecs');
+
+  if(!timerEnabled) {
+    if(bar)   { bar.style.width='100%'; bar.className='timer-bar'; }
+    if(secEl) secEl.textContent='–';
+    return;
+  }
+
+  const update = () => {
+    const pct = (timeLeft / totalTime) * 100;
+    if(bar)   { bar.style.width=pct+'%'; bar.className='timer-bar'+(pct<33?' danger':pct<60?' warn':''); }
+    if(secEl) secEl.textContent = timeLeft;
+    if(timeLeft<=0){ clearInterval(timer); cb(); return; }
+    timeLeft--;
+  };
+  update();
+  timer = setInterval(update, 1000);
+}
+
+// Appends step-by-step panel below feedback, and reveals the in-card Next button
+function showStepsPanel(steps, answer) {
+  const wrap = document.getElementById('qWrapper');
+  const old = document.getElementById('stepsPanel');
+  if(old) old.remove();
+
+  const panel = document.createElement('div');
+  panel.id = 'stepsPanel';
+  panel.style.cssText='margin-top:14px;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.35);border-radius:14px;padding:16px 20px;text-align:left;width:100%;';
+  panel.innerHTML=`
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:10px;">📋 Step-by-Step Answer</div>
+    <div style="font-size:15px;color:var(--text);font-family:'Nunito',sans-serif;font-weight:700;line-height:1.8;">${steps}</div>
+    <div style="margin-top:10px;font-family:'Fredoka One',cursive;font-size:18px;color:var(--yellow);">✅ Answer: ${answer}</div>
+  `;
+  wrap.appendChild(panel);
+
+  // Reveal the Next button that's already sitting inside the question card
+  const nextBtn = document.getElementById('nextBtn');
+  if(nextBtn) nextBtn.style.display = 'inline-block';
+}
+
+// ═══════════════════════════════════════════════════════════
+// NEXT BUTTON HANDLER — blitz & fill
+// ═══════════════════════════════════════════════════════════
+let pendingAdvance = null;
+
+function advanceQuestion() {
+  qIndex++;
+  if(qIndex < TOTAL_Q) {
+    if(pendingAdvance==='blitz') renderBlitzQ();
+    else renderFillQ();
+  } else {
+    showResults(pendingAdvance);
+  }
+}
+
+// ── Right arrow key → Next Question (works in all modes) ──
+document.addEventListener('keydown', function(e) {
+  if(e.key !== 'ArrowRight') return;
+
+  // Blitz or Fill: only if the Next button is visible
+  const nextBtn = document.getElementById('nextBtn');
+  if(nextBtn && nextBtn.style.display !== 'none') {
+    advanceQuestion();
+    return;
+  }
+
+  // Chain mode: only if chainNextBtn is visible
+  const chainNextBtn = document.getElementById('chainNextBtn');
+  if(chainNextBtn && chainNextBtn.style.display !== 'none') {
+    chainNextBtn.click();
+    return;
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// BLITZ MODE — MCQ, manual Next
+// ═══════════════════════════════════════════════════════════
+function startBlitz() {
+  score=0; combo=0; qIndex=0; correctCount=0; wrongCount=0;
+  pendingAdvance='blitz';
+  qList = getActiveQuestions();
+  document.getElementById('scoreVal').textContent=0;
+  buildDots(TOTAL_Q,0);
+  applyTimerUI();
+  showScreen('game');
+  renderBlitzQ();
+}
+
+function renderBlitzQ() {
+  const q = qList[qIndex];
+  document.getElementById('qNumVal').textContent = qIndex+1;
+  document.getElementById('scoreVal').textContent = score;
+  startTimerBar(Q_TIME_BLITZ, 'timerBar', ()=>blitzAnswer(null));
+
+  const opts = shuffle([q.answer, ...q.distractors]);
+  const wrap = document.getElementById('qWrapper');
+  wrap.innerHTML=`
+    <div class="question-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:0;">
+          <div class="q-type-label">Question ${qIndex+1} of ${TOTAL_Q}</div>
+          <div class="q-prompt" style="font-size:clamp(16px,3vw,24px);line-height:1.4">${q.q}</div>
+          <div class="q-instruction" style="margin-top:12px">Select the correct answer:</div>
+        </div>
+        <button id="nextBtn" onclick="advanceQuestion()" style="display:none;flex-shrink:0;background:linear-gradient(135deg,var(--teal),var(--purple));border:none;border-radius:12px;padding:12px 22px;font-family:'Fredoka One',cursive;font-size:18px;color:#fff;cursor:pointer;box-shadow:0 4px 18px rgba(0,212,170,0.4);white-space:nowrap;">
+          Next →
+        </button>
+      </div>
+    </div>
+    <div class="options-grid" id="optsGrid">
+      ${opts.map(o=>`<button class="opt-btn" onclick="blitzAnswer(this,'${o.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><span style="font-size:clamp(13px,2.5vw,21px)">${o}</span></button>`).join('')}
+    </div>
+    <div class="feedback-banner" id="feedbackBanner"></div>
+  `;
+  nextDot(qIndex);
+}
+
+function blitzAnswer(btn, selected) {
+  clearInterval(timer);
+  const q = qList[qIndex];
+  const correct = selected === q.answer;
+  document.querySelectorAll('.opt-btn').forEach(b=>{
+    b.disabled=true;
+    const txt = b.querySelector('span').textContent;
+    if(txt===q.answer) b.classList.add('correct');
+    else if(txt===selected && !correct) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('feedbackBanner');
+  if(correct){
+    correctCount++;
+    combo++;
+    const pts = 100 + (combo>1?50*(combo-1):0) + Math.round(timeLeft*5);
+    score+=pts;
+    spawnPoints(pts,'#4ade80');
+    if(combo>1) updateCombo(combo);
+    fb.className='feedback-banner correct';
+    fb.innerHTML=`✅ Correct!`;
+    markDot(qIndex,true);
+  } else {
+    wrongCount++;
+    combo=0;
+    score=Math.max(0,score-20);
+    fb.className='feedback-banner wrong';
+    const disp = selected ? `You chose: ${selected} — ` : 'Time up! ';
+    fb.innerHTML=`❌ ${disp}Answer: <strong>${q.answer}</strong>`;
+    markDot(qIndex,false);
+    spawnPoints(-20,'#f87171');
+  }
+  document.getElementById('scoreVal').textContent=score;
+  showStepsPanel(q.steps, q.answer);
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILL MODE — type answer, manual Next
+// ═══════════════════════════════════════════════════════════
+function startFill() {
+  score=0; combo=0; qIndex=0; correctCount=0; wrongCount=0;
+  pendingAdvance='fill';
+  qList = getActiveQuestions();
+  document.getElementById('scoreVal').textContent=0;
+  buildDots(TOTAL_Q,0);
+  applyTimerUI();
+  showScreen('game');
+  renderFillQ();
+}
+
+function renderFillQ() {
+  const q = qList[qIndex];
+  document.getElementById('qNumVal').textContent = qIndex+1;
+  document.getElementById('scoreVal').textContent = score;
+  startTimerBar(Q_TIME_FILL, 'timerBar', ()=>fillSubmit(true));
+
+  const wrap = document.getElementById('qWrapper');
+  wrap.innerHTML=`
+    <div class="question-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:0;">
+          <div class="q-type-label">Question ${qIndex+1} of ${TOTAL_Q} — Type Your Answer</div>
+          <div class="q-prompt" style="font-size:clamp(16px,3vw,24px);line-height:1.4;margin-bottom:16px">${q.q}</div>
+        </div>
+        <button id="nextBtn" onclick="advanceQuestion()" style="display:none;flex-shrink:0;background:linear-gradient(135deg,var(--teal),var(--purple));border:none;border-radius:12px;padding:12px 22px;font-family:'Fredoka One',cursive;font-size:18px;color:#fff;cursor:pointer;box-shadow:0 4px 18px rgba(0,212,170,0.4);white-space:nowrap;">
+          Next →
+        </button>
+      </div>
+    </div>
+    <div class="answer-input-wrap">
+      <input class="answer-input" id="fillAns" type="text" placeholder="Type your answer…" autocomplete="off">
+      <button class="submit-btn" onclick="fillSubmit(false)" id="submitBtn">Check ✓</button>
+    </div>
+    <div class="feedback-banner" id="feedbackBanner"></div>
+  `;
+  const inp = document.getElementById('fillAns');
+  inp.focus();
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') fillSubmit(false); });
+  wrap.dataset.correct = q.answer;
+  wrap.dataset.steps   = q.steps;
+  nextDot(qIndex);
+}
+
+function normalise(s) {
+  return s.trim().toLowerCase().replace(/\s+/g,'').replace(/[−–]/g,'-').replace(/×/g,'x');
+}
+
+function fillSubmit(timedOut) {
+  clearInterval(timer);
+  const wrap    = document.getElementById('qWrapper');
+  const inp     = document.getElementById('fillAns');
+  const correct = wrap.dataset.correct;
+  const steps   = wrap.dataset.steps;
+  const userAns = timedOut ? '' : (inp ? inp.value : '');
+  const isCorrect = !timedOut && normalise(userAns) === normalise(correct);
+
+  if(inp){ inp.disabled=true; inp.classList.add(isCorrect?'correct':'wrong'); }
+
+  const fb = document.getElementById('feedbackBanner');
+  if(isCorrect){
+    correctCount++;
+    combo++;
+    const pts = 120 + Math.round(timeLeft*5) + (combo>1?50*(combo-1):0);
+    score+=pts;
+    spawnPoints(pts,'#4ade80');
+    if(combo>1) updateCombo(combo);
+    fb.className='feedback-banner correct';
+    fb.innerHTML=`✅ Correct!`;
+    markDot(qIndex,true);
+  } else {
+    wrongCount++;
+    combo=0;
+    score=Math.max(0,score-20);
+    spawnPoints(-20,'#f87171');
+    fb.className='feedback-banner wrong';
+    fb.innerHTML=`❌ ${timedOut?'Time up! ':''}Answer: <strong>${correct}</strong>`;
+    markDot(qIndex,false);
+  }
+  document.getElementById('scoreVal').textContent=score;
+  const btn=document.getElementById('submitBtn');
+  if(btn) btn.disabled=true;
+  showStepsPanel(steps, correct);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHAIN MODE — manual Next after each answer
+// ═══════════════════════════════════════════════════════════
+let chainQ = null;
+let chainLocked = false;
+let chainPool = [];
+
+function startChain() {
+  chainStreak=0; score=0; chainLocked=false;
+  chainPool=shuffle(getActiveQuestions());
+  document.getElementById('chainScore').textContent='0';
+  document.getElementById('streakVal').textContent='0';
+  document.getElementById('bestVal').textContent=bestStreak;
+  document.getElementById('chainFeedback').className='feedback-banner';
+  document.getElementById('chainStepsPanel').style.display='none';
+  document.getElementById('chainNextBtn').style.display='none';
+  document.getElementById('chainNextBtn').textContent='Next Question →';
+  document.getElementById('chainNextBtn').onclick=()=>chainNext();
+  showScreen('chain-game');
+  nextChainQ();
+}
+
+function nextChainQ() {
+  chainLocked=false;
+  if(chainPool.length===0) chainPool=shuffle(getActiveQuestions());
+  const item=chainPool.pop();
+  const opts=shuffle([item.answer,...item.distractors]);
+  chainQ={item, opts};
+
+  document.getElementById('chainFeedback').className='feedback-banner';
+  document.getElementById('chainStepsPanel').style.display='none';
+  document.getElementById('chainNextBtn').style.display='none';
+
+  document.getElementById('chainQ').innerHTML=`
+    <span style="color:var(--text-muted);font-size:16px;display:block;margin-bottom:8px">Answer this:</span>
+    <span style="font-size:clamp(15px,3vw,22px);line-height:1.4">${item.q}</span>
+  `;
+  document.getElementById('chainOpts').innerHTML=opts.map(o=>`
+    <button class="chain-opt" onclick="chainAnswer(this,'${o.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
+      <span style="font-size:clamp(12px,2.5vw,18px)">${o}</span>
+    </button>
+  `).join('');
+}
+
+function chainAnswer(btn, selected) {
+  if(chainLocked) return;
+  chainLocked=true;
+  const correct = selected===chainQ.item.answer;
+  document.querySelectorAll('.chain-opt').forEach(b=>{
+    b.disabled=true;
+    const txt=b.querySelector('span').textContent;
+    if(txt===chainQ.item.answer) b.classList.add('correct');
+    else if(txt===selected && !correct) b.classList.add('wrong');
+  });
+
+  // Always show steps panel
+  document.getElementById('chainStepsText').innerHTML=chainQ.item.steps+
+    `<div style="margin-top:8px;font-family:'Fredoka One',cursive;font-size:17px;color:var(--yellow);">✅ Answer: ${chainQ.item.answer}</div>`;
+  document.getElementById('chainStepsPanel').style.display='block';
+
+  const fb=document.getElementById('chainFeedback');
+  if(correct){
+    chainStreak++;
+    if(chainStreak>bestStreak) bestStreak=chainStreak;
+    score+=50*(1+Math.floor(chainStreak/5));
+    document.getElementById('chainScore').textContent=chainStreak;
+    document.getElementById('streakVal').textContent=chainStreak;
+    document.getElementById('bestVal').textContent=bestStreak;
+    spawnPoints(50*(1+Math.floor(chainStreak/5)),'#4ade80');
+    fb.className='feedback-banner correct';
+    fb.innerHTML=`🔥 Correct! Streak: ${chainStreak}!`;
+    document.getElementById('chainNextBtn').textContent='Next Question →';
+    document.getElementById('chainNextBtn').onclick=()=>chainNext();
+  } else {
+    fb.className='feedback-banner wrong';
+    fb.innerHTML=`💔 Chain broken at ${chainStreak}! Answer: <strong>${chainQ.item.answer}</strong>`;
+    spawnPoints(0,'#f87171');
+    correctCount=chainStreak; wrongCount=1;
+    document.getElementById('chainNextBtn').textContent='See Results →';
+    document.getElementById('chainNextBtn').onclick=()=>showResults('chain');
+  }
+  document.getElementById('chainNextBtn').style.display='inline-block';
+}
+
+function chainNext(){
+  nextChainQ();
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════════
+function showResults(mode) {
+  clearInterval(timer);
+  clearInterval(timerTick);
+  const pct=Math.round((correctCount/(correctCount+wrongCount||1))*100);
+  const trophy=pct>=90?'🏆':pct>=70?'🎉':pct>=50?'⭐':'📚';
+  const title=pct>=90?'Outstanding!':pct>=70?'Great Work!':pct>=50?'Good Effort!':'Keep Practising!';
+  const gradeCol=pct>=90?'var(--yellow)':pct>=70?'var(--teal)':pct>=50?'var(--blue)':'var(--red)';
+
+  document.getElementById('resultTrophy').textContent=trophy;
+  document.getElementById('resultTitle').textContent=title;
+  document.getElementById('resultScore').textContent=score;
+
+  const stats=document.getElementById('resultStats');
+  if(mode==='chain'){
+    stats.innerHTML=`
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--yellow)">${correctCount}</div><div class="result-stat-lbl">Best Streak</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--teal)">${score}</div><div class="result-stat-lbl">Points</div></div>
+    `;
+  } else {
+    stats.innerHTML=`
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--green)">${correctCount}</div><div class="result-stat-lbl">Correct</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--red)">${wrongCount}</div><div class="result-stat-lbl">Wrong</div></div>
+      <div class="result-stat"><div class="result-stat-val" style="color:var(--blue)">${pct}%</div><div class="result-stat-lbl">Accuracy</div></div>
+    `;
+  }
+
+  const gradeEl=document.getElementById('resultGrade');
+  gradeEl.style.cssText=`background:${gradeCol}22;color:${gradeCol};border:2px solid ${gradeCol}44;`;
+  gradeEl.textContent=mode==='chain'?`🔥 Chain Master — ${bestStreak} streak!`:
+    pct>=90?'🌟 Excellent — Full marks territory!':
+    pct>=70?'⭐ Good job — Keep it up!':
+    pct>=50?'📚 Getting there — Review the steps!':
+    '🔄 Practise more — Read the step-by-step hints!';
+
+  showScreen('results');
+}
+
+function replayMode() {
+  if(currentMode==='blitz') startBlitz();
+  else if(currentMode==='fill') startFill();
+  else if(currentMode==='chain') startChain();
+}
+</script>
+</body>
+</html>
