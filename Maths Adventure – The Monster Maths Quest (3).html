@@ -1,0 +1,171 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Maths Adventure – The Monster Maths Quest</title>
+<style>
+:root{--bg:#1b1450;--bg2:#3b2a8f;--card:#fffdf5;--ink:#241a4a;--gold:#ffc83d;--ok:#2fb86b;--bad:#ef5b5b;color-scheme:light}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{font-family:"Trebuchet MS",Verdana,sans-serif;background:radial-gradient(circle at 20% 0,var(--bg2),var(--bg));color:#fff;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+#app{max-width:860px;margin:0 auto;padding:12px}
+h1,h2,h3{margin:.3em 0}.card{background:var(--card);color:var(--ink);border-radius:18px;padding:16px;margin:10px 0;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+button{font:inherit;font-weight:700;border:0;border-radius:14px;padding:12px 18px;margin:4px;background:var(--gold);color:#3a2a00;box-shadow:0 4px 0 #b88a00;cursor:pointer}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 #b88a00}button.sec{background:#8f7bff;color:#fff;box-shadow:0 4px 0 #5a46c9}button:disabled{opacity:.45;cursor:not-allowed}
+input[type=text],input:not([type]){font:inherit;font-size:1.3em;padding:10px;border-radius:12px;border:3px solid #8f7bff;width:100%;max-width:300px;text-align:center}
+.top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;background:rgba(0,0,0,.3);border-radius:14px;padding:8px 12px;font-weight:700}
+.bar{height:18px;background:#0005;border-radius:9px;overflow:hidden;border:2px solid #fff6}.bar i{display:block;height:100%;transition:width .5s}
+.hp{background:linear-gradient(90deg,#ff5a5a,#ff9a3d)}.xp{background:linear-gradient(90deg,#4cd6ff,#8f7bff)}
+.worlds{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.world{border-radius:18px;padding:14px;color:#fff;text-align:center;box-shadow:0 6px 0 #0006}.world.lock{filter:grayscale(1);opacity:.6}
+.big{font-size:64px;line-height:1.1}.arena{display:flex;justify-content:space-around;align-items:flex-end;min-height:130px}
+.mon{font-size:92px;transition:.3s}.hero{font-size:72px}
+.hit{animation:shake .5s}.die{animation:die 1s forwards}.atk{animation:lunge .5s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-14px) rotate(-8deg)}40%,80%{transform:translateX(14px) rotate(8deg)}}
+@keyframes die{to{transform:scale(0) rotate(540deg);opacity:0}}@keyframes lunge{50%{transform:translateX(90px) scale(1.2)}}
+.pop{position:fixed;left:50%;top:30%;transform:translateX(-50%);font-size:2.2em;font-weight:900;color:var(--gold);text-shadow:0 3px 0 #000;animation:up 1.2s forwards;pointer-events:none;z-index:9}
+@keyframes up{to{top:15%;opacity:0}}
+.q{font-size:1.25em;font-weight:700}.fb{border-left:8px solid var(--bad);background:#fff0f0}.good{border-left-color:var(--ok);background:#effff4}
+.step{background:#f1ecff;border-radius:10px;padding:8px 12px;margin:6px 0}table{width:100%;border-collapse:collapse;color:var(--ink);font-size:.95em}th,td{border:1px solid #ccc;padding:5px;text-align:left}th{background:#e3dcff}
+.cert{border:10px double #b88a00;background:#fffbe8;color:#3a2a00;text-align:center;padding:24px}
+.kp{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-width:320px;margin:8px auto}.kp button{margin:0;padding:14px 0;font-size:1.3em;touch-action:manipulation}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.badge{display:inline-block;background:#fff3;border-radius:20px;padding:4px 10px;margin:3px}
+@media print{body{background:#fff}#app>*:not(.cert){display:none}}
+</style></head><body><div id="err" style="display:none;background:#b00020;color:#fff;padding:10px;font:14px sans-serif;position:relative;z-index:99"></div><div id="app"><p style="text-align:center;padding:30px">Loading the Maths Kingdom…</p></div>
+<script>
+window.onerror=function(m,u,l){var e=document.getElementById('err');e.style.display='block';e.textContent='Oops, something went wrong: '+m+' (line '+l+'). Please tell your teacher.';};
+// ---------- QUESTION BANK (from the Year 7 revision booklet). [question, answer, explanation steps, similar question, similar answer]
+const W=[
+{n:'Length Lagoon',t:'Units of Length',e:'🌊',m:'🦑',b:'🐙',c:'linear-gradient(#0a7ea4,#17b5c9)',intro:'Octopus Inky has tangled the Lagoon\u2019s rulers! Convert lengths to untangle them.',
+q:[
+['How many centimetres are in 3.4 m?','340',['There are 100 cm in 1 m.','Going to a SMALLER unit means MORE of them, so multiply: 3.4 × 100 = 340.'],'How many centimetres are in 2.7 m?','270'],
+['Write 1.35 m in millimetres.','1350',['1 m = 1000 mm, so multiply by 1000.','1.35 × 1000 = 1350 (the decimal point moves 3 places right).'],'Write 2.4 m in millimetres.','2400'],
+['Tom says 0.7 km is the same as 70 m. How many metres is 0.7 km really?','700',['Tom multiplied by 100, but 1 km = 1000 m.','0.7 × 1000 = 700 m.'],'How many metres is 0.9 km?','900'],
+['A ribbon is 5.6 m long. It is cut into pieces 35 cm long. How many pieces?','16',['Same unit first: 5.6 m = 560 cm.','Pieces = 560 ÷ 35 = 16.','Check: 16 × 35 = 560.'],'A 4.2 m ribbon is cut into 30 cm pieces. How many pieces?','14'],
+['Mia walks 2.4 km to school and 2.4 km back each day for 5 days. How many km altogether?','24',['One day: 2.4 + 2.4 = 4.8 km.','Five days: 4.8 × 5 = 24 km.'],'Sam walks 3.5 km each way to the park for 4 days. How many km altogether?','28'],
+['Each pencil is 175 mm long. How many pencils placed end to end cover a 7 m shelf exactly?','40',['Convert 7 m to mm: 7 × 1000 = 7000 mm.','7000 ÷ 175 = 40.','Check: 40 × 175 = 7000.'],'Pencils are 250 mm long. How many cover a 6 m shelf?','24']]},
+{n:'Perimeter Peaks',t:'Perimeter',e:'⛰️',m:'🐲',b:'🐉',c:'linear-gradient(#7a5af8,#c04fd8)',intro:'Dragon Dash has built fences around the Peaks! Walk all the way around each shape.',
+q:[
+['Find the perimeter (cm) of a rectangle 14 cm long and 9 cm wide.','46',['Perimeter = 2 × length + 2 × width.','2 × 14 + 2 × 9 = 28 + 18 = 46 cm.'],'Perimeter (cm) of a rectangle 12 cm by 7 cm?','38'],
+['A square paddock has sides 6.5 m. What is its perimeter in metres?','26',['A square has 4 equal sides.','4 × 6.5 = 26 m.'],'A square has sides 7.5 m. Perimeter in metres?','30'],
+['A rug is 2.4 m long and 85 cm wide. Find its perimeter in metres.','6.5',['Same unit first: 85 cm = 0.85 m.','2 × (2.4 + 0.85) = 2 × 3.25 = 6.5 m.'],'A mat is 3.2 m long and 60 cm wide. Perimeter in metres?','7.6'],
+['A rectangle has perimeter 38 cm and length 12 cm. Find its width (cm).','7',['Length + width is HALF the perimeter: 38 ÷ 2 = 19.','Width = 19 − 12 = 7 cm.','Check: 2 × (12 + 7) = 38.'],'A rectangle has perimeter 46 cm and length 15 cm. Width (cm)?','8'],
+['An equilateral triangle has perimeter 36 cm. How long is each side (cm)?','12',['Equilateral means 3 equal sides.','36 ÷ 3 = 12 cm.'],'An equilateral triangle has perimeter 45 cm. Side length (cm)?','15'],
+['A 18 m by 12.5 m garden is fenced all round. Fencing costs $14.50 per metre. Total cost in dollars?','884.5',['Perimeter = 2 × (18 + 12.5) = 61 m.','Cost = 61 × 14.50 = $884.50.'],'A 40 m fence costs $12.50 per metre. Total cost in dollars?','500']]},
+{n:'Area Arena',t:'Area',e:'🏟️',m:'🦂',b:'🗿',c:'linear-gradient(#e0902b,#d9602b)',intro:'Scorpion Sting has covered the Arena floor in mystery tiles! Work out how much surface each shape covers.',
+q:[
+['Find the area (cm²) of a rectangle 12 cm long and 7 cm wide.','84',['Area of a rectangle = length × width.','12 × 7 = 84 cm².'],'Area (cm²) of a rectangle 9 cm by 8 cm?','72'],
+['A triangle has base 14 cm and perpendicular height 8 cm. Find its area (cm²).','56',['Triangle area = ½ × base × height (half of a rectangle).','½ × 14 × 8 = 7 × 8 = 56 cm².'],'Area (cm²) of a triangle with base 10 cm and height 6 cm?','30'],
+['A square courtyard has sides 9 m. What is its area in m²?','81',['Square area = side × side.','9 × 9 = 81 m².'],'Area (m²) of a square with sides 12 m?','144'],
+['A triangle has base 4.5 cm and perpendicular height 6 cm. Its slanted side is 10 cm. Find its area (cm²).','13.5',['The slanted side is NOT needed. Only use the base and the perpendicular height.','½ × 4.5 × 6 = 2.25 × 6 = 13.5 cm².'],'A triangle has base 5.2 cm, height 5 cm and a slanted side 9 cm. Area (cm²)?','13'],
+['A rectangle has area 72 cm² and width 6 cm. Find its length (cm).','12',['Area = length × width, so length = area ÷ width.','72 ÷ 6 = 12 cm.','Check: 12 × 6 = 72.'],'A rectangle has area 96 cm² and width 8 cm. Length (cm)?','12'],
+['A bathroom floor is 3.6 m by 2.4 m. It is covered with square tiles 30 cm by 30 cm. How many tiles are needed?','96',['Convert to cm: 360 cm by 240 cm.','Tiles along: 360 ÷ 30 = 12. Tiles across: 240 ÷ 30 = 8.','12 × 8 = 96 tiles.'],'A floor is 2.4 m by 1.8 m with 30 cm square tiles. How many tiles?','48']]},
+{n:'Volume Volcano',t:'Volume',e:'🌋',m:'🦎',b:'🐊',c:'linear-gradient(#c0392b,#f39c12)',intro:'Lizard Lava has filled the Volcano with boxes! Work out how much space each one takes up.',
+q:[
+['Find the volume (cm³) of a rectangular prism 8 cm long, 5 cm wide and 3 cm high.','120',['Volume = length × width × height.','8 × 5 × 3 = 40 × 3 = 120 cm³.'],'Volume (cm³) of a prism 7 cm by 4 cm by 3 cm?','84'],
+['A cube has edges 4 cm long. Find its volume (cm³).','64',['A cube has 3 equal edges: volume = edge × edge × edge.','4 × 4 × 4 = 64 cm³.'],'Volume (cm³) of a cube with edges 5 cm?','125'],
+['A prism has volume 180 cm³, length 10 cm and width 6 cm. Find its height (cm).','3',['180 = 10 × 6 × height, so 180 = 60 × height.','Height = 180 ÷ 60 = 3 cm.','Check: 10 × 6 × 3 = 180.'],'A prism has volume 240 cm³, length 8 cm and width 5 cm. Height (cm)?','6'],
+['A fish tank is 60 cm long, 30 cm wide and 40 cm high. How many litres does it hold when full? (1 L = 1000 cm³)','72',['Volume = 60 × 30 × 40 = 72 000 cm³.','72 000 ÷ 1000 = 72 litres.'],'A tank is 50 cm by 40 cm by 30 cm. How many litres when full?','60'],
+['The 72 L tank is filled to ¾ of its capacity. How many litres of water are in it?','54',['¾ means 3 out of every 4 parts.','72 ÷ 4 = 18, then 18 × 3 = 54 litres.'],'A 48 L tank is filled to ¾ of its capacity. How many litres?','36'],
+['A stack of 1 cm cubes has 5 cubes in the bottom layer, 3 in the middle layer and 1 on top. What is its volume (cm³)?','9',['Each 1 cm cube is 1 cm³.','Count layer by layer: 5 + 3 + 1 = 9 cubes.','Volume = 9 cm³.'],'A stack has 6 cubes in the bottom layer, 4 in the middle and 2 on top. Volume (cm³)?','12']]},
+{n:'Chance Caverns',t:'Theoretical Probability',e:'🔮',m:'🦇',b:'👻',c:'linear-gradient(#2c3e8f,#7b2fbf)',intro:'Bat Bandit has hidden the crystals in the caves of chance! Answer as a simplified fraction (like 3/8) or a decimal.',
+q:[
+['A spinner has 8 equal sectors numbered 1 to 8. Find P(even number).','1/2',['P = favourable outcomes ÷ total outcomes.','Even numbers: 2, 4, 6, 8 = 4 outcomes, so P = 4/8.','Simplify: divide top and bottom by 4 to get 1/2.'],'A spinner has 10 equal sectors numbered 1 to 10. Find P(multiple of 5).','1/5'],
+['A bag has 9 red, 7 blue, 5 green and 3 yellow marbles. Find P(red) as a simplified fraction.','3/8',['Total marbles = 9 + 7 + 5 + 3 = 24.','P(red) = 9/24.','Divide top and bottom by 3 to get 3/8.'],'A bag has 20 marbles and 8 are red. Find P(red) as a simplified fraction.','2/5'],
+['Cards are numbered 1 to 20. Find P(prime number) as a simplified fraction.','2/5',['Primes up to 20: 2, 3, 5, 7, 11, 13, 17, 19 (1 is NOT prime).','That is 8 cards out of 20, so P = 8/20.','Divide top and bottom by 4 to get 2/5.'],'Cards are numbered 1 to 20. Find P(multiple of 3) as a simplified fraction.','3/10'],
+['The probability of rain tomorrow is 0.35. What is the probability that it does NOT rain?','0.65',['P(not A) = 1 − P(A).','1 − 0.35 = 0.65.'],'P(winning) is 0.45. What is P(not winning)?','0.55'],
+['The probability of winning a raffle is 3/8. Write this as a decimal.','0.375',['A fraction means top ÷ bottom.','3 ÷ 8 = 0.375.'],'The probability is 5/8. Write it as a decimal.','0.625'],
+['A bag has 40 counters. P(red) = 3/8. How many counters are red?','15',['P(red) × total = number of red counters.','3/8 of 40 = 40 ÷ 8 × 3 = 5 × 3 = 15.'],'A bag has 40 counters. P(blue) = 1/4. How many are blue?','10']]},
+{n:'Probability Palace',t:'Experimental Probability',e:'🏯',m:'🧌',b:'👑',c:'linear-gradient(#1e8449,#1abc9c)',intro:'Troll Trickster is rigging the palace games! Use real results to work out the chances.',
+q:[
+['A spinner is spun 50 times and lands on red 17 times. What is the experimental probability of red (decimal)?','0.34',['Experimental probability = times it happened ÷ total trials.','17 ÷ 50 = 0.34.'],'It lands on green 12 times in 50 spins. Experimental probability of green (decimal)?','0.24'],
+['A paper cup is tossed 60 times and lands upside down 13 times. How many upside-down landings would you expect in 300 tosses?','65',['Experimental P = 13/60.','Expected number = P × trials = 13/60 × 300.','300 ÷ 60 = 5, then 13 × 5 = 65.'],'A cup lands on its side 8 times in 40 tosses. How many side landings expected in 200 tosses?','40'],
+['A factory tests 250 bulbs and 10 are faulty. How many faulty bulbs would you expect in 4000 bulbs?','160',['Experimental P(faulty) = 10/250 = 0.04.','Expected = 0.04 × 4000 = 160.'],'5 of 200 bulbs are faulty. How many faulty in 4000 bulbs?','100'],
+['A fair die is rolled 120 times. How many sixes would you expect?','20',['Theoretical P(six) = 1/6.','Expected = 1/6 × 120 = 120 ÷ 6 = 20.','Real results can differ a little from this.'],'A fair die is rolled 60 times. How many sixes would you expect?','10'],
+['A spinner was spun 80 times. The experimental probability of B is 0.35. How many times did it land on B?','28',['Frequency = probability × trials.','0.35 × 80 = 28.'],'P(C) is 0.25 in 60 spins. How many times did it land on C?','15'],
+['In a sample of 25 students, 6 walk to school. Estimate how many of the 750 students at the school walk.','180',['Experimental P(walk) = 6/25 = 0.24.','0.24 × 750 = 180.','It is only an estimate because the sample is small.'],'In a sample of 20 students, 5 walk. Estimate how many of 800 students walk.','200']]},
+{n:'Mixed-Up Marketplace',t:'Mixed Revision',e:'🏪',m:'🧌',b:'🦹',c:'linear-gradient(#b8860b,#e67e22)',intro:'The monsters have mixed up every skill! Decide which method each problem needs.',
+q:[
+['A vegetable patch is 3.5 m long and 240 cm wide. Find its area in m².','8.4',['Same unit first: 240 cm = 2.4 m.','Area = 3.5 × 2.4 = 8.4 m².'],'A patch is 2.5 m long and 160 cm wide. Area in m²?','4'],
+['Mulch costs $12 per m². How much (in dollars) to cover 8.4 m²?','100.8',['Cost = area × price.','8.4 × 12 = 100.8, so $100.80.'],'Mulch costs $8 per m². Cost (dollars) to cover 6.5 m²?','52'],
+['A paddling pool is 2 m long and 1.5 m wide and filled 30 cm deep. How many litres of water is that? (1 L = 1000 cm³)','900',['Convert to cm: 200 × 150 × 30.','Volume = 900 000 cm³.','900 000 ÷ 1000 = 900 L.'],'A pool is 100 cm by 80 cm and filled 50 cm deep. How many litres?','400'],
+['A tap fills a pool at 15 litres per minute. How many minutes to put in 900 litres?','60',['Time = total ÷ rate.','900 ÷ 15 = 60 minutes.'],'How many minutes to put in 450 litres at 15 litres per minute?','30'],
+['A shed wall is a rectangle 8 m wide and 3.5 m high with a triangle on top (base 8 m, height 3 m). Find the total area in m².','40',['Rectangle: 8 × 3.5 = 28 m².','Triangle: ½ × 8 × 3 = 12 m².','Add: 28 + 12 = 40 m².'],'A wall is a rectangle 6 m by 2.5 m with a triangle on top (base 6 m, height 2 m). Total area in m²?','21'],
+['A bag has 20 tiles and 7 are green. A tile is drawn and put back, 100 times. How many green tiles would you expect?','35',['P(green) = 7/20 = 0.35.','Expected = 0.35 × 100 = 35.'],'5 of 20 tiles are green. Drawn and replaced 80 times. How many green expected?','20']]},
+{n:'Starfall Citadel',t:'Challenging Extension',e:'🌌',m:'👾',b:'🐲',c:'linear-gradient(#0f2027,#2c5364)',intro:'Only true champions reach the Citadel. These are the toughest puzzles in the Kingdom!',
+q:[
+['A cube has its edges doubled. How many times larger is its volume?','8',['Try edge 3 cm: volume 3 × 3 × 3 = 27. Doubled edge 6 cm: 6 × 6 × 6 = 216.','216 ÷ 27 = 8 times larger.'],'A square has its sides doubled. How many times larger is its area?','4'],
+['A prism is 12 cm long. Its L-shaped end is made of a bottom arm 10 cm by 3 cm and an upright arm 3 cm wide and 5 cm tall. Find its volume (cm³).','540',['Area of end = 10 × 3 + 3 × 5 = 30 + 15 = 45 cm².','Volume = area of end × length = 45 × 12 = 540 cm³.'],'An L-shaped end is a 8 cm by 2 cm arm plus a 2 cm by 4 cm arm. Length 10 cm. Volume (cm³)?','240'],
+['A bag has 10 red and 15 blue marbles. How many red marbles must be ADDED so that P(red) = 2/3?','20',['For 2/3, red must be twice the blue.','15 blue means 30 red are needed.','30 − 10 = 20 more red.','Check: 30/45 = 2/3.'],'A bag has 5 red and 10 blue. How many red must be added so P(red) = 2/3?','15'],
+['A rectangle is 10 cm by 6 cm. A triangle with base 15 cm has the same area. Find its height (cm).','8',['Rectangle area = 10 × 6 = 60 cm².','½ × 15 × h = 60, so 7.5 × h = 60.','h = 60 ÷ 7.5 = 8 cm.'],'A rectangle is 8 cm by 5 cm. A triangle with base 10 cm has the same area. Height (cm)?','8'],
+['A pin lands point up with probability 0.7. What is the fewest number of throws needed to expect at least 50 point-up landings?','72',['0.7 × throws must be at least 50.','50 ÷ 0.7 = 71.4..., so round UP.','Check: 71 × 0.7 = 49.7 (not enough), 72 × 0.7 = 50.4 (enough).'],'P(point up) = 0.8. Fewest throws to expect at least 40 point-up?','50'],
+['A 3 × 3 × 3 cube made of 27 small cubes is painted red on the outside, then taken apart. How many small cubes have exactly 2 red faces?','12',['Cubes with 2 red faces sit on the edges, but not the corners.','A cube has 12 edges, with 1 middle cube on each.','So 12 cubes.'],'In the same cube, how many small cubes have exactly 1 red face?','6']]}
+];
+const COMING=[];
+const CHARS=['🧙','🦸','🥷','🧝','🦄'],COST=[0,30,60,100,150];
+// ---------- STATE
+let S,DB={},sound=true,B=null,paused=false;
+const $=s=>document.querySelector(s),app=$('#app');
+function load(){try{DB=JSON.parse(localStorage.getItem('mq_db')||'{}')}catch(e){DB={}}}
+function save(){try{DB[S.name]=S;localStorage.setItem('mq_db',JSON.stringify(DB))}catch(e){}}
+function fresh(n){return{name:n,coins:0,gems:0,stars:{},badges:[],log:[],char:0,own:[0],wrong:{},boss:{},final:false,best:0,time:0,start:Date.now()}}
+function beep(f,d=.12,ty='square'){if(!sound)return;try{const a=beep.a||(beep.a=new(window.AudioContext||window.webkitAudioContext)),o=a.createOscillator(),g=a.createGain();o.type=ty;o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d)}catch(e){}}
+const win=()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.15),i*110)),lose=()=>beep(180,.3,'sawtooth');
+function kp(){return'<div class="kp">'+['7','8','9','b','4','5','6','.','1','2','3','/','0'].map(k=>'<button class="sec" type="button" onclick="key(\''+k+'\')">'+(k=='b'?'⌫':k)+'</button>').join('')+'</div>'}
+function key(k){const e=document.getElementById('ans')||document.getElementById('s2');if(!e)return;e.value=k=='b'?e.value.slice(0,-1):e.value+k}
+function norm(x){x=String(x).trim();const m=x.match(/^(-?[\d.]+)\s*\/\s*([\d.]+)/);if(m)return parseFloat(m[1])/parseFloat(m[2]);return parseFloat(x.replace(/[^0-9.\-]/g,''))}
+function badge(k,t){if(!S.badges.includes(k)){S.badges.push(k);pop('🏅 Badge: '+t)}}
+function pop(t){const d=document.createElement('div');d.className='pop';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1250)}
+function shuf(a){return a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1])}
+// ---------- SCREENS
+function hud(){const st=Object.values(S.stars).reduce((a,b)=>a+b,0);return`<div class="top"><span>${CHARS[S.char]} ${S.name}</span><span>🪙 ${S.coins}</span><span>💎 ${S.gems}</span><span>⭐ ${st}</span><span><button class="sec" onclick="sound=!sound;this.textContent=sound?'🔊':'🔇'">${sound?'🔊':'🔇'}</button><button class="sec" onclick="home()">🗺️ Map</button></span></div>`}
+function start(){load();app.innerHTML=`<div class="card" style="text-align:center"><div class="big">🏰⚔️🐲</div><h1>The Monster Maths Quest</h1><p class="q">Monsters have stolen the Maths Kingdom\u2019s crystals and trapped its guardians! Become a <b>Math Warrior</b>: solve problems to defeat monsters and restore the kingdom.</p>
+<p>✅ Right answer = attack! 🔥 Streaks = combos 🎁 Win coins, gems, stars and badges.<br>❌ Wrong answer = we teach you the secret, then you try a similar one!</p>
+<p><input id="nm" placeholder="Your nickname" maxlength="16" aria-label="Nickname"></p><button onclick="go()">▶ Start / Continue</button><button class="sec" onclick="teacher()">👩‍🏫 Teacher</button></div>`}
+function go(){const n=($('#nm').value||'').trim();if(!n){pop('Enter a nickname!');return}S=DB[n]||fresh(n);S.start=Date.now();save();home()}
+function done(w){return S.boss[w]}
+function home(){const cp=W.filter((_,i)=>done(i)).length;const all=cp==W.length;
+app.innerHTML=hud()+`<div class="card"><b>Progress</b> ${cp}/${W.length+COMING.length} worlds<div class="bar"><i class="xp" style="width:${100*cp/(W.length+COMING.length)}%"></i></div></div><div class="worlds">`+W.map((w,i)=>`<div class="world" style="background:${w.c}"><div class="big">${w.e}</div><h3>${w.n}</h3><small>${w.t}</small><div>${'⭐'.repeat(S.stars[i]||0)||'&nbsp;'}</div><button onclick="world(${i})">${done(i)?'Replay':'Enter'}</button></div>`).join('')
++COMING.map(n=>`<div class="world lock" style="background:#555"><div class="big">🔒</div><h3>${n}</h3><small>Coming in Stage 3</small></div>`).join('')+`<div class="world" style="background:linear-gradient(#222,#600)"><div class="big">${all?'👹':'🔒'}</div><h3>Ultimate Maths Monster</h3><small>${all?'Mixed questions from every world!':'Defeat all worlds first'}</small><br><button ${all?'':'disabled'} onclick="ultimate()">⚔️ Final Battle</button></div></div>
+<div class="card">${CHARS.map((c,i)=>`<button class="${S.char==i?'':'sec'}" onclick="buy(${i})">${c} ${S.own.includes(i)?(S.char==i?'(equipped)':'Equip'):'🪙'+COST[i]}</button>`).join('')}<br>${S.badges.map(b=>`<span class="badge">🏅 ${b}</span>`).join('')||'<small>No badges yet — go win some!</small>'}</div>
+<div class="card"><button class="sec" onclick="review()">📖 My answers &amp; explanations</button> <button class="sec" onclick="teacher()">👩‍🏫 Teacher dashboard</button></div>`}
+function buy(i){if(S.own.includes(i))S.char=i;else if(S.coins>=COST[i]){S.coins-=COST[i];S.own.push(i);S.char=i;pop('Unlocked '+CHARS[i])}else pop('Need more coins!');save();home()}
+function world(i){const w=W[i];app.innerHTML=hud()+`<div class="card" style="text-align:center"><div class="big">${w.e}</div><h2>${w.n}</h2><p>${w.intro}</p></div><div class="worlds">
+<div class="card"><h3>Stage 1</h3><p>${w.m} Easy monsters</p><button onclick="fight(${i},[0,1,2],'Stage 1')">Fight</button></div>
+<div class="card"><h3>Stage 2</h3><p>${w.m} Tougher monsters</p><button onclick="fight(${i},[3,4,5],'Stage 2')">Fight</button></div>
+<div class="card"><h3>BOSS ${w.b}</h3><p>Mixed questions!</p><button onclick="boss(${i})" ${S.stars[i]>=1?'':'disabled'}>${S.stars[i]>=1?'Fight Boss':'Win a stage first'}</button></div></div>`}
+function boss(i){const w=W[i];fight(i,shuf([0,1,2,3,4,5]).slice(0,4),'BOSS',true)}
+function ultimate(){const l=[];W.forEach((w,i)=>shuf([0,1,2,3,4,5]).slice(0,3).forEach(j=>l.push([i,j])));B=null;fight(-1,shuf(l),'ULTIMATE',true)}
+// ---------- BATTLE
+function fight(wi,idx,title,isBoss){const lst=wi<0?idx:idx.map(j=>[wi,j]);B={wi,lst:lst.slice(),n:lst.length,i:0,hp:100,streak:0,ok:0,title,isBoss,t0:Date.now(),extra:false};ask()}
+function ask(){const [w,j]=B.lst[B.i],Wd=W[w],q=Wd.q[j];B.cur={w,j,q,t:Date.now()};
+app.innerHTML=hud()+`<div class="card" style="background:${Wd.c};color:#fff"><b>${Wd.n} – ${B.title}</b> · Question ${B.i+1}/${B.n} · 🔥 Streak ${B.streak}
+<div class="arena"><div class="hero" id="hero">${CHARS[S.char]}</div><div style="text-align:center"><div>Monster HP</div><div class="bar" style="width:140px"><i class="hp" style="width:${B.hp}%"></i></div><div class="mon" id="mon">${B.isBoss?Wd.b:Wd.m}</div></div></div></div>
+<div class="card"><div class="q">${q[0]}</div><p><input id="ans" inputmode="none" autocomplete="off" placeholder="Tap numbers below" aria-label="Answer" onkeydown="if(event.key=='Enter')check()"></p>${kp()}<button onclick="check()">⚔️ Attack!</button><button class="sec" onclick="pause()">⏸ Pause</button></div>`;}
+function pause(){app.innerHTML=hud()+`<div class="card" style="text-align:center"><h2>⏸ Paused</h2><button onclick="ask()">▶ Resume</button><button class="sec" onclick="home()">Leave battle</button></div>`}
+function rec(ok,c,a){S.log.push({w:W[c.w].t,q:c.q[0],a:a,ok:ok,c:c.q[1],ex:c.q[2],ms:Date.now()-c.t});if(!ok)S.wrong[W[c.w].t]=(S.wrong[W[c.w].t]||0)+1;save()}
+function check(){const c=B.cur,a=$('#ans').value;if(!a.trim())return;const ok=Math.abs(norm(a)-norm(c.q[1]))<1e-9;rec(ok,c,a);
+if(ok){B.streak++;B.ok++;const combo=B.streak>=2,dmg=Math.ceil(100/B.n)*(combo?1.3:1);B.hp=Math.max(0,B.hp-dmg);const coin=5+(combo?B.streak*2:0)+(B.isBoss?5:0);S.coins+=coin;S.gems+=B.isBoss||c.j>=4?1:0;win();
+$('#hero').classList.add('atk');$('#mon').classList.add('hit');pop(combo?'🔥 COMBO x'+B.streak+'! +'+coin+'🪙':'💥 Hit! +'+coin+'🪙');if(S.log.filter(l=>l.ok).length==1)badge('first','First Victory');if(B.streak==3){badge('combo3','Combo Master');if(!B.up&&B.i<B.n-1){B.up=1;B.lst.splice(B.i+1,B.n,...B.lst.slice(B.i+1).sort((x,y)=>y[1]-x[1]));pop('⬆️ Level up: harder questions!')}}
+setTimeout(()=>feed(true),700)}else{B.streak=0;lose();B.wr=(B.wr||0)+1;if(B.wr==2&&!B.gd){B.gd=1;B.lst.splice(B.i+1,0,[c.w,c.j==0?1:0]);B.n++;pop('🧭 Guided practice added')}$('#mon').classList.add('atk');setTimeout(()=>feed(false,a),500)}save()}
+function feed(ok,a){const c=B.cur,q=c.q;const st=q[2].map((s,i)=>`<div class="step">${i+1}. ${s}</div>`).join('');
+if(ok){app.innerHTML=hud()+`<div class="card fb good"><h2>✅ Correct!</h2><p>Great work, ${S.name}!</p><div><b>Why it works:</b>${st}</div><button onclick="next()">Next ➜</button></div>`;return}
+app.innerHTML=hud()+`<div class="card fb"><h2>Not quite! Don\u2019t give up, Math Warrior! 💪</h2><p>You answered <b>${a}</b>. The correct answer is <b>${q[1]}</b>.</p><h3>Here\u2019s the secret:</h3>${st}<p>${hint(q,a)}</p><p class="q">Now try a similar one to power up:</p><div class="card" style="background:#f6f3ff"><div class="q">${q[3]}</div><input id="s2" inputmode="none" autocomplete="off" placeholder="Tap numbers below" onkeydown="if(event.key=='Enter')chk2()">${kp()}<button onclick="chk2()">Try it!</button><div id="r2"></div></div></div>`}
+function hint(q,a){const n=norm(a),r=norm(q[1]);if(n==r*10||n==r/10)return'💡 Your answer is 10 times too big or too small — check where the decimal point or the 0s go.';if(n==r*100||n==r/100)return'💡 Your answer is 100 times out — did you multiply by 100 when you needed 1000 (or the reverse)?';return'💡 Compare each step above with your own working to find where it changed.'}
+function chk2(){const c=B.cur,v=$('#s2').value;if(!v.trim())return;const ok=Math.abs(norm(v)-norm(c.q[4]))<1e-9;rec(ok,{...c,q:[c.q[3],c.q[4],c.q[2]],t:c.t},v);
+if(ok){win();B.hp=Math.max(0,B.hp-Math.ceil(100/B.n)/2);$('#r2').innerHTML=`<p style="color:#1a8a4a"><b>✅ Yes! ${c.q[4]} — you\u2019ve got the method!</b> Half-damage bonus!</p><button onclick="next()">Continue the adventure ➜</button>`}
+else{lose();$('#r2').innerHTML=`<p><b>Close! The answer is ${c.q[4]}.</b> Use the same steps as above, with the new numbers.</p><button onclick="next()">Continue the adventure ➜</button>`}}
+function next(){B.i++;if(B.i<B.n){ask();return}
+// monster memory: extra practice after a stage if this topic has been missed repeatedly
+const t=W[B.cur.w].t;if(!B.extra&&(S.wrong[t]||0)>=3&&B.wi>=0){B.extra=true;const w=B.cur.w,pool=W[w].q.filter((_,k)=>1);const k=Math.floor(Math.random()*pool.length);B.lst.push([w,k]);B.n++;B.hp=Math.max(B.hp,30);B.mem=true;pop('🧠 Monster Memory: extra practice!');ask();return}
+end()}
+function end(){const m=$('#mon'),pc=Math.round(100*B.ok/B.lst.length),stars=pc>=90?3:pc>=60?2:1;S.coins+=stars*10;
+if(B.title==='ULTIMATE'){S.final=true;S.best=Math.max(S.best,pc);badge('champ','Maths Champion');save();return champion(pc)}
+S.stars[B.wi]=Math.max(S.stars[B.wi]||0,stars);if(B.isBoss){S.boss[B.wi]=true;S.gems+=3;badge('boss'+B.wi,W[B.wi].b+' Slayer')}
+if(B.streak>=B.lst.length)badge('perfect','Perfect Run');save();win();
+app.innerHTML=hud()+`<div class="card" style="text-align:center"><div class="big die">${B.isBoss?W[B.wi].b:W[B.wi].m}</div><h2>🎉 ${B.isBoss?'BOSS DEFEATED!':'Stage cleared!'}</h2><p>${B.ok}/${B.lst.length} correct first time (${pc}%)</p><div class="big">${'⭐'.repeat(stars)}</div><p>+${stars*10} 🪙 ${B.isBoss?'· 🎁 Treasure chest: +3 💎':''}</p><button onclick="world(${B.wi})">Continue ➜</button><button class="sec" onclick="home()">Map</button></div>`}
+function champion(pc){win();app.innerHTML=hud()+`<div class="cert card" id="cert"><div class="big">🏆</div><h1>Certificate of Achievement</h1><p>This certifies that</p><h1 style="color:#b8002a">${S.name}</h1><p>has defeated the Ultimate Maths Monster and is crowned a</p><h1>🌟 MATHS CHAMPION 🌟</h1><p>Final battle score: <b>${pc}%</b> · Coins ${S.coins} · Gems ${S.gems}</p><p>Badges: ${S.badges.length}</p><button onclick="window.print()">🖨 Print certificate</button> <button class="sec" onclick="home()">Back to map</button></div>`}
+// ---------- REVIEW & TEACHER
+function review(){const L=S.log.slice().reverse();app.innerHTML=hud()+`<div class="card"><h2>📖 My answers</h2>${L.length?L.map(l=>`<div class="step">${l.ok?'✅':'❌'} <b>${l.q}</b><br>Your answer: ${l.a}${l.ok?'':' · Correct: <b>'+l.c+'</b>'}<details><summary>Explanation</summary>${l.ex.map(s=>'<div>• '+s+'</div>').join('')}</details></div>`).join(''):'Nothing yet — start a battle!'}<button onclick="home()">Back</button></div>`}
+function teacher(){load();const rows=Object.values(DB).map(s=>{const a=s.log.length,c=s.log.filter(l=>l.ok).length,tm=Math.round(s.log.reduce((x,l)=>x+l.ms,0)/60000*10)/10;const tp={};s.log.forEach(l=>{if(!l.ok)tp[l.w]=(tp[l.w]||0)+1});const wr=s.log.filter(l=>!l.ok).map(l=>l.q);return{n:s.name,a,c,w:a-c,p:a?Math.round(100*c/a):0,tm,tp:Object.entries(tp).map(e=>e[0]+' ('+e[1]+')').join(', ')||'–',wr:[...new Set(wr)]}});
+window._rows=rows;app.innerHTML=`<div class="card"><h2>👩‍🏫 Teacher Dashboard</h2><p>Shows every student who has played on THIS device/browser.</p>${rows.length?`<div style="overflow-x:auto"><table><tr><th>Student</th><th>Attempted</th><th>Correct</th><th>Incorrect</th><th>Score</th><th>Minutes</th><th>Struggled topics</th></tr>${rows.map(r=>`<tr><td>${r.n}</td><td>${r.a}</td><td>${r.c}</td><td>${r.w}</td><td>${r.p}%</td><td>${r.tm}</td><td>${r.tp}</td></tr>`).join('')}</table></div>${rows.map(r=>`<details><summary><b>${r.n}</b>: questions answered incorrectly</summary>${r.wr.length?r.wr.map(x=>'<div>• '+x+'</div>').join(''):'None 🎉'}</details>`).join('')}<p><button onclick="csv()">📋 Copy results as CSV</button> <button class="sec" onclick="clr()">Clear all data</button></p><textarea id="csv" style="width:100%;height:90px;display:none"></textarea>`:'<p>No students yet.</p>'}<button onclick="S?home():start()">Back</button></div>`}
+function csv(){const t='Student,Attempted,Correct,Incorrect,Percent,Minutes,Struggled topics\n'+window._rows.map(r=>[r.n,r.a,r.c,r.w,r.p,r.tm,'"'+r.tp+'"'].join(',')).join('\n');const x=$('#csv');x.style.display='block';x.value=t;x.select();try{navigator.clipboard.writeText(t);pop('Copied!')}catch(e){document.execCommand&&document.execCommand('copy')}}
+function clr(){if(confirm('Delete ALL student data on this device?')){try{localStorage.removeItem('mq_db')}catch(e){}DB={};teacher()}}
+start();
+</script></body></html>
